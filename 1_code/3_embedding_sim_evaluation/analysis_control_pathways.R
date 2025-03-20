@@ -15,6 +15,8 @@ library(jsonlite)
 library(rtiktoken)
 library(bayesbio)
 library(GOSemSim)
+library(tidygraph)
+library(igraph)
 
 control_pathways <- control_data
 
@@ -86,6 +88,7 @@ all_combined_info <- combine_info(info = all_text_info, include_gene_name = FALS
 embedding_matrix <- get_embedding_matrix(text = all_combined_info, include_gene_name = FALSE, api_provider = "openai", text_embedding_model = "text-embedding-3-small", api_key = api_key)
 
 sim_matrix <- calculate_cosine_sim(m = embedding_matrix)
+
 semantic_sim_df <-
   as.data.frame.table(sim_matrix, responseName = "sim") %>%
   dplyr::filter(Var1 != Var2) %>%                 # Remove self-edges
@@ -655,14 +658,26 @@ single_sim_b4_aftr %>%
 
 # II. Clustering ====
 
-## Create tidygraph object
+## 1. Create tidygraph object ====
 ### Collect edge data
-sim.cutoff <- 0.5
+control_pathways <- control_data
 
+semantic_sim_df <-
+  as.data.frame.table(sim_matrix, responseName = "sim") %>%
+  dplyr::filter(Var1 != Var2) %>%                 # Remove self-edges
+  dplyr::rename(from = Var1, to = Var2) %>%
+  dplyr::mutate(across(c(from, to), as.character)) %>%
+  dplyr::filter(from < to)
+
+### For graph based clustering
+sim.cutoff <- 0.5
 edge_data <-
-  combined_sim_df[, c(1:3)] %>%
-  dplyr::rename(sim = sim_semantic) %>%
+  semantic_sim_df %>%
   dplyr::filter(sim > sim.cutoff)
+
+### For clustering (hcluster, binary cut)
+edge_data <-
+  semantic_sim_df
 
 node_data <-
   control_pathways %>%
@@ -670,10 +685,10 @@ node_data <-
   dplyr::rename(node = id) %>%
   dplyr::select(node, expected_module, expected_count, database, name)
 
-### Expected modules
-exp_fm <- levels(factor(node_data$expected_module))
+#### Expected modules
+#exp_fm <- levels(factor(node_data$expected_module))
 
-### Create tidygraph object
+#### Create tidygraph object
 graph_data <-
   tidygraph::tbl_graph(nodes = node_data,
                        edges = edge_data,
@@ -681,13 +696,55 @@ graph_data <-
                        node_key = "node") %>%
   dplyr::mutate(degree = tidygraph::centrality_degree())
 
-## edge_betweenness clustering based on sim ====
+## 2. Clustering ====
+
+### 2.1 edge_betweenness clustering ====
 subnetwork <-
   suppressWarnings(igraph::cluster_edge_betweenness(graph = graph_data, weights = abs(igraph::edge_attr(graph_data, "sim"))))
 #### Assign functional module label for pathways
 cluster <-
   paste("Functional_module", as.character(igraph::membership(subnetwork)), sep = "_")
 
+### 2.2 hierarchical clustering ====
+cosine_dist <- 1 - sim_matrix
+#### Convert distance matrix to a 'dist' object
+cosine_dist_obj <- as.dist(cosine_dist)
+#### Perform hierarchical clustering
+hc <- hclust(cosine_dist_obj, method = "complete")
+# #### Plot the hierarchical tree
+# plot(hc, main = "Hierarchical Clustering Dendrogram", xlab = "pathways")
+# rect.hclust(hc, k = 12, border = "red")  # Highlight 3 clusters
+#### Cut the tree to assign clusters (number of clusters(k) or height(h))
+clusters <- cutree(hc, k = 9)
+# clusters <- cutree(hc, h = 0.7)
+
+#### Assign functional module label for pathways
+cluster <-
+  paste("Functional_module", as.character(clusters[node_data$node]), sep = "_")
+
+### 2.3 Markov chain clustering ====
+res <- MCL::mcl(sim_matrix,
+           addLoops = FALSE,
+           max.iter = 500,
+           expansion = 2,
+           inflation = 2.5,
+           allow1 = FALSE)
+res$Cluster
+
+### 2.4 Spectral clustering ====
+clusters <- Spectrum::Spectrum(sim_matrix, maxk = 100, showres = FALSE, silent = TRUE, clusteralg = 'km')
+clusters <- clusters$assignments
+
+### 2.5 Binary cut clustering ====
+clusters <- simplifyEnrichment::binary_cut(mat = sim_matrix, cutoff = 0.7)
+levels(as.factor(clusters))
+simplifyEnrichment::plot_binary_cut(mat = sim_matrix, cutoff = 0.7)
+
+cluster <-
+  paste("Functional_module", as.character(clusters), sep = "_")
+cluster_label <- data.frame(node = rownames(sim_matrix), module = cluster)
+
+### Update graph data with clustering result
 graph_data <-
   graph_data %>%
   igraph::upgrade_graph() %>%
@@ -699,14 +756,40 @@ g_node_data <-
   tidygraph::activate(what = "nodes") %>%
   tidygraph::as_tibble()
 
-### Sankeyplot to show the relation between the expected functional module and actual module by clustering ====
-p_list = c("ggalluvial", "ggplot2")
-for(p in p_list){if (!requireNamespace(p)){install.packages(p)}
-  library(p, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)}
+#### For clustering (hcluster)
+graph_data <- graph_data %>%
+  activate(edges) %>%
+  filter(
+    # Get the module attribute for the from node
+    .N()$module[from] ==
+      # Get the module attribute for the to node
+      .N()$module[to]
+)
 
-library(devtools)
-if(!requireNamespace("amplicon", quietly = TRUE))
-  install_github("davidsjoberg/ggsankey")
+#### For binary cut clustering
+graph_data <-
+  graph_data %>%
+  igraph::upgrade_graph() %>%
+  tidygraph::activate(what = "nodes") %>%
+  dplyr::left_join(cluster_label)
+
+graph_data <- graph_data %>%
+  activate(edges) %>%
+  filter(
+    # Get the module attribute for the from node
+    .N()$module[from] ==
+      # Get the module attribute for the to node
+      .N()$module[to]
+  )
+
+## 3. Sankeyplot to show the relation between the expected functional module and actual module by clustering ====
+# p_list = c("ggalluvial", "ggplot2")
+# for(p in p_list){if (!requireNamespace(p)){install.packages(p)}
+#   library(p, character.only = TRUE, quietly = TRUE, warn.conflicts = FALSE)}
+#
+# library(devtools)
+# if(!requireNamespace("amplicon", quietly = TRUE))
+#   install_github("davidsjoberg/ggsankey")
 
 suppressWarnings(suppressMessages(library(ggalluvial)))
 suppressWarnings(suppressMessages(library(ggplot2)))
@@ -723,12 +806,10 @@ df <- to_lodes_form(data[, 1:ncol(data)], axes = 1:ncol(data), id = "value")
 colors <- colorRampPalette(c('#0ca9ce', '#78cfe5', '#c6ecf1', '#ff6f81', '#ff9c8f', '#ffc2c0','#d386bf',
                              '#cdb1d2', '#fae6f0', '#eb6fa6', '#ff88b5', '#00b1a5',"#ffa68f","#ffca75","#97bc83","#acd295",
                              "#00ada1","#009f93","#ace2da","#448c99","#00b3bc","#b8d8c9","#db888e","#e397a4","#ead0c7",
-                             "#8f9898","#bfcfcb"))(16)
+                             "#8f9898","#bfcfcb"))(12)
 
-library(viridis)
-colors_16 <- viridis(16, option = "D")
 
-pdf("control_cluster_edge_betweenness.pdf", width=10, height=8)
+pdf("control_cluster_binary_cut.pdf", width=10, height=8)
 p1 <- ggplot(df, aes(x = x, stratum = stratum, alluvium = value, fill = stratum, label = stratum)) +
   geom_flow(width = 0.15, curve_type = "cubic", alpha = 0.7, color = 'gray80', size = 0.2) +
   geom_stratum(width = 0.15, color = "gray90") +
@@ -741,4 +822,102 @@ p1 <- ggplot(df, aes(x = x, stratum = stratum, alluvium = value, fill = stratum,
         panel.grid = element_blank(),
         plot.margin = margin(5, 5, 5, 5))
 print(p1)
+
 dev.off()
+
+## 4. Create network ====
+plot1 <-
+  graph_data %>%
+  ggraph::ggraph(layout = 'fr',
+                 circular = FALSE) +
+  ggforce::geom_mark_ellipse(
+    aes(x = x,
+        y = y,
+        group = expected_module,
+        color = expected_module),
+    alpha = 1,
+    expand = unit(5, "mm"),
+    linewidth = 1,
+    label.fontsize = 9,
+    con.cap = 0,
+    fill = NA,
+    con.type = "straight",
+    show.legend = TRUE
+  ) +
+  ggraph::geom_edge_link(
+    aes(width = sim),
+    color = "black",
+    alpha = 1,
+    show.legend = TRUE
+  ) +
+  ggraph::geom_node_point(
+    aes(fill = database),
+    size = 6,
+    shape = 21,
+    alpha = 1,
+    show.legend = TRUE
+  ) +
+  scale_color_manual(values = colors) +
+  scale_fill_manual(values = c(GO = "#eeca40", KEGG = "#fd7541", Reactome = "#23b9c7")) +
+  guides(
+    color = guide_legend(order = 1, ncol = 1, title = "Expected_functional_module", override.aes = list(linewidth = 0.5)),
+    fill = guide_legend(order = 2, ncol = 1, title = "Database", override.aes = list(linewidth = 0)),
+    edge_width = guide_legend(order = 3, title = "Similarity", override.aes = list(linewidth = 0))) +
+  ggraph::scale_edge_width_continuous(range = c(0.1, 2)) +
+  scale_size_continuous(range = c(3, 10)) +
+  labs(fill = "Database") +
+  ggraph::theme_graph() +
+  theme(
+    plot.background = element_rect(fill = "transparent", color = NA),
+    panel.background = element_rect(fill = "transparent", color = NA),
+    legend.position = "left",
+    legend.background = element_rect(fill = "transparent", color = NA),
+    plot.title = element_text(hjust = 0.5)
+  ) +
+  ggraph::geom_node_text(
+    aes(x = x,
+        y = y,
+        label = stringr::str_wrap(paste0(module, ":", name), width = 30)),
+    check_overlap = TRUE,
+    size = 3,
+    repel = TRUE)
+
+library(Cairo)
+CairoPDF("control_cluster_binary_cut_network.pdf", width=18, height=18)
+p1 <- plot1
+print(p1)
+dev.off()
+
+## Evaluation of clustering ====
+library(clValid)
+node_data <-
+  graph_data %>%
+  tidygraph::activate(what = "nodes") %>%
+  tidygraph::as_tibble()
+cluster_label <-
+  node_data %>%
+  dplyr::select(node, module) %>%
+  dplyr::mutate(module_id = as.numeric(sub(pattern = "Functional_module_", replacement = "", x = module)))
+
+# Give single module a cluster label
+module_node <- node_data$node %>% unique()
+single_node <- setdiff(rownames(sim_matrix), module_node)
+
+max_id <- max(cluster_label$module_id)  # Current maximum module_id
+new_ids <- seq(max_id + 1, max_id + length(single_node))  # Increment for each new node
+
+new_cluster_label <- data.frame(
+  node = single_node,
+  module = paste0("Functional_module_", seq_along(single_node)),  # Placeholder module names
+  module_id = new_ids
+)
+
+cluster_label_with_single <- rbind(cluster_label, new_cluster_label)
+
+## reorder label
+
+cosine_dist <- 1 - openai_semantic_sim_matrix
+cosine_dist_obj <- as.dist(cosine_dist)
+
+dunn_index <- clValid::dunn(distance = cosine_dist_obj, clusters = clusters)
+silhouette_index <- mean(cluster::silhouette(clusters, cosine_dist_obj)[, "sil_width"])
