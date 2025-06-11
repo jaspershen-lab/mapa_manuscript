@@ -13,12 +13,28 @@ library(httr2)
 library(curl)
 library(jsonlite)
 library(rtiktoken)
-library(bayesbio)
-library(GOSemSim)
-library(tidygraph)
 library(igraph)
+library(mclust)
+library(fpc)
 
+# Module size ====
+library(ggplot2)
 control_pathways <- control_data
+
+control_data |>
+  dplyr::pull(expected_module) |>
+  as.factor() |>
+  table() |>
+  as.data.frame() |>
+  ggplot(aes(x = reorder(Var1, Freq), y = Freq)) +
+  geom_col() +
+  theme_bw() +
+  theme(
+    # axis.text.x = element_text(angle = 60, vjust = 0.5, hjust = 1)
+    axis.text.x = element_text(angle = 60, hjust = 1)
+  ) +
+  xlab("Expected Functional Module") +
+  ylab("Size of Expected Functional Module")
 
 # I. Similarity ====
 
@@ -345,8 +361,8 @@ create_single_panel_correlation <- function(df) {
     ggplot2::geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
     ggplot2::scale_color_manual(values = metric_colors) +
     ggplot2::labs(
-      title = "Correlation between Semantic Similarity and Other Metrics",
-      x = "Semantic Similarity",
+      title = "Correlations between Pathway Biotext Embedding Similarity and Other Metrics",
+      x = "Pathway Biotext Embedding Similarity",
       y = "Similarity Value",
       color = "Similarity Metric"
     ) +
@@ -367,7 +383,8 @@ create_single_panel_correlation <- function(df) {
       ),
       color = metric_colors,
       hjust = 0,
-      fontface = "bold"
+      fontface = "bold",
+      size = 4
     )
 
   # Return the correlation results and plot
@@ -478,7 +495,7 @@ combine_go_similarity_dataframes_tidyverse <-
 eva_sim_re_go <- create_single_panel_correlation_go(go_combined_sim_df)
 eva_sim_re_go$plot
 
-pdf("control_similarity_wang_vs_others.pdf", width=8, height=8)
+pdf("control_similarity_biotext_embedding_vs_others_go_terms.pdf", width=8, height=8)
 p <- eva_sim_re_go$plot
 print(p)
 dev.off()
@@ -493,15 +510,15 @@ create_single_panel_correlation_go <- function(df) {
   }
 
   # Calculate Pearson correlations
-  cor_semantic <- cor(df$sim_wang, df$sim_semantic, use = "complete.obs", method = "pearson")
-  cor_op <- cor(df$sim_wang, df$sim_op, use = "complete.obs", method = "pearson")
-  cor_kappa <- cor(df$sim_wang, df$sim_kappa, use = "complete.obs", method = "pearson")
-  cor_dice <- cor(df$sim_wang, df$sim_dice, use = "complete.obs", method = "pearson")
-  cor_jaccard <- cor(df$sim_wang, df$sim_jaccard, use = "complete.obs", method = "pearson")
+  cor_semantic <- cor(df$sim_semantic, df$sim_wang, use = "complete.obs", method = "pearson")
+  cor_op <- cor(df$sim_semantic, df$sim_op, use = "complete.obs", method = "pearson")
+  cor_kappa <- cor(df$sim_semantic, df$sim_kappa, use = "complete.obs", method = "pearson")
+  cor_dice <- cor(df$sim_semantic, df$sim_dice, use = "complete.obs", method = "pearson")
+  cor_jaccard <- cor(df$sim_semantic, df$sim_jaccard, use = "complete.obs", method = "pearson")
 
   # Create a data frame for correlation results
   cor_results <- data.frame(
-    metric = c("Semantic", "Overlap", "Kappa", "Dice", "Jaccard"),
+    metric = c("Wang", "Overlap", "Kappa", "Dice", "Jaccard"),
     correlation = c(cor_semantic, cor_op, cor_kappa, cor_dice, cor_jaccard)
   )
 
@@ -510,22 +527,22 @@ create_single_panel_correlation_go <- function(df) {
 
   # Reshape data for plotting
   plot_data <- data.frame(
-    sim_wang = rep(df$sim_wang, 5),
-    sim_value = c(df$sim_semantic, df$sim_op, df$sim_kappa, df$sim_dice, df$sim_jaccard),
-    metric = factor(rep(c("Semantic", "Overlap", "Kappa", "Dice", "Jaccard"), each = nrow(df)))
+    sim_semantic = rep(df$sim_semantic, 5),
+    sim_value = c(df$sim_wang, df$sim_jaccard, df$sim_op, df$sim_kappa, df$sim_dice),
+    metric = factor(rep(c("Wang", "Jaccard", "Overlap", "Kappa", "Dice"), each = nrow(df)))
   )
 
   # Define colors for each metric
-  metric_colors <- c("Semantic" = "#e9c46b", "Overlap" = "#e66f51", "Kappa" = "#264653", "Dice" = "#299e8c", "Jaccard" = "#f2a361")
+  metric_colors <- c("Wang" = "#f2a361", "Jaccard" = "#e9c46b", "Overlap" = "#e66f51", "Kappa" = "#264653", "Dice" = "#299e8c")
 
   # Create the plot with all regression lines in one panel
-  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = sim_wang, y = sim_value, color = metric)) +
+  p <- ggplot2::ggplot(plot_data, ggplot2::aes(x = sim_semantic, y = sim_value, color = metric)) +
     ggplot2::geom_point(alpha = 0.3) +
     ggplot2::geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
     ggplot2::scale_color_manual(values = metric_colors) +
     ggplot2::labs(
-      title = "Correlation between Wang Similarity and Other Metrics",
-      x = "Wang Similarity",
+      title = "Correlation between Pathway Biotext Embedding Similarity and Other Metrics (GO terms)",
+      x = "Pathway Biotext Embedding Similarity",
       y = "Similarity Value",
       color = "Similarity Metric"
     ) +
@@ -535,18 +552,19 @@ create_single_panel_correlation_go <- function(df) {
       "text",
       x = rep(min(df$sim_wang, na.rm = TRUE) + 0.05, 5),
       y = seq(
-        from = max(c(df$sim_semantic, df$sim_op, df$sim_kappa, df$sim_dice, df$sim_jaccard), na.rm = TRUE) - 0.05,
-        to = max(c(df$sim_semantic, df$sim_op, df$sim_kappa, df$sim_dice, df$sim_jaccard), na.rm = TRUE) - 0.35,
+        from = max(c(df$sim_semantic, df$sim_jaccard, df$sim_op, df$sim_kappa, df$sim_dice), na.rm = TRUE) - 0.05,
+        to = max(c(df$sim_semantic, df$sim_jaccard, df$sim_op, df$sim_kappa, df$sim_dice), na.rm = TRUE) - 0.35,
         length.out = 5
       ),
       label = sprintf(
         "%s: r = %.3f",
-        c("Semantic", "Overlap", "Kappa", "Dice", "Jaccard"),
-        c(cor_semantic, cor_op, cor_kappa, cor_dice, cor_jaccard)
+        c("Wang", "Jaccard", "Overlap", "Kappa", "Dice"),
+        c(cor_semantic, cor_jaccard, cor_op, cor_kappa, cor_dice)
       ),
       color = metric_colors,
       hjust = 0,
-      fontface = "bold"
+      fontface = "bold",
+      size = 4
     )
 
   # Return the correlation results and plot
@@ -570,6 +588,14 @@ n23   <- length(intersect(B, C))
 n13   <- length(intersect(A, C))
 n123  <- length(Reduce(intersect, list(A, B, C)))
 
+area1 <- 536 + 32 + 16
+area2 <- 16
+area3 <- 84 + 32
+n12   <- 16
+n23   <- 0
+n13   <- 32
+n123  <- 0
+
 # Draw the triple Venn diagram
 venn_plot <- draw.triple.venn(
   area1 = area1,
@@ -579,7 +605,7 @@ venn_plot <- draw.triple.venn(
   n23   = n23,
   n13   = n13,
   n123  = n123,
-  category = c("hsa03030 \nDNA replication", "R-HSA-68952 \nDNA replication initiation", "R-HSA-69306 \nDNA replication"),
+  # category = c("hsa03030 \nDNA replication", "R-HSA-68952 \nDNA replication initiation", "R-HSA-69306 \nDNA replication"),
 
   # Specify fill colors and transparency
   fill  = c("#d15356", "#ebb869", "#4f94d7"),
@@ -675,13 +701,19 @@ edge_data <-
   semantic_sim_df %>%
   dplyr::filter(sim > sim.cutoff)
 
+node_data <-
+  control_pathways %>%
+  # dplyr::filter(id %in% edge_data$from | id %in% edge_data$to) %>%
+  dplyr::rename(node = id) %>%
+  dplyr::select(node, expected_module, expected_count, database, name)
+
 ### For clustering (hcluster, binary cut)
 edge_data <-
   semantic_sim_df
 
 node_data <-
   control_pathways %>%
-  dplyr::filter(id %in% edge_data$from | id %in% edge_data$to) %>%
+  # dplyr::filter(id %in% edge_data$from | id %in% edge_data$to) %>%
   dplyr::rename(node = id) %>%
   dplyr::select(node, expected_module, expected_count, database, name)
 
@@ -704,6 +736,7 @@ subnetwork <-
 #### Assign functional module label for pathways
 cluster <-
   paste("Functional_module", as.character(igraph::membership(subnetwork)), sep = "_")
+edge_btw_clusters <- as.numeric(igraph::membership(subnetwork))
 
 ### 2.2 hierarchical clustering ====
 cosine_dist <- 1 - sim_matrix
@@ -711,11 +744,16 @@ cosine_dist <- 1 - sim_matrix
 cosine_dist_obj <- as.dist(cosine_dist)
 #### Perform hierarchical clustering
 hc <- hclust(cosine_dist_obj, method = "complete")
+
+# clustering <-
+  # dynamicTreeCut::cutreeDynamic(hc, distM = as.matrix(cosine_dist_obj), verbose = 0, minClusterSize = 1)
+
 # #### Plot the hierarchical tree
 # plot(hc, main = "Hierarchical Clustering Dendrogram", xlab = "pathways")
 # rect.hclust(hc, k = 12, border = "red")  # Highlight 3 clusters
 #### Cut the tree to assign clusters (number of clusters(k) or height(h))
-clusters <- cutree(hc, k = 9)
+hc_cluster <- cutree(hc, k = 9)
+hc_cluster_12 <- cutree(hc, k = 12)
 # clusters <- cutree(hc, h = 0.7)
 
 #### Assign functional module label for pathways
@@ -723,20 +761,20 @@ cluster <-
   paste("Functional_module", as.character(clusters[node_data$node]), sep = "_")
 
 ### 2.3 Markov chain clustering ====
-res <- MCL::mcl(sim_matrix,
+mcl_res <- MCL::mcl(sim_matrix,
            addLoops = FALSE,
            max.iter = 500,
            expansion = 2,
            inflation = 2.5,
-           allow1 = FALSE)
-res$Cluster
+           allow1 = TRUE)
+mcl_res$Cluster
 
 ### 2.4 Spectral clustering ====
-clusters <- Spectrum::Spectrum(sim_matrix, maxk = 100, showres = FALSE, silent = TRUE, clusteralg = 'km')
-clusters <- clusters$assignments
+spectrum_clusters <- Spectrum::Spectrum(sim_matrix, maxk = 100, showres = FALSE, silent = TRUE, clusteralg = 'km')
+spectrum_clusters$assignments
 
 ### 2.5 Binary cut clustering ====
-clusters <- simplifyEnrichment::binary_cut(mat = sim_matrix, cutoff = 0.7)
+binary_cut_clusters <- simplifyEnrichment::binary_cut(mat = sim_matrix, cutoff = 0.7)
 levels(as.factor(clusters))
 simplifyEnrichment::plot_binary_cut(mat = sim_matrix, cutoff = 0.7)
 
@@ -765,6 +803,14 @@ graph_data <- graph_data %>%
       # Get the module attribute for the to node
       .N()$module[to]
 )
+
+graph_data <- graph_data %>%
+  activate(edges) %>%
+  filter(
+    # Get the module attribute for the from node
+    .N()$module[from] == "GO:0016567" & .N()$module[to] == "GO:0061630"
+  )
+
 
 #### For binary cut clustering
 graph_data <-
@@ -830,20 +876,20 @@ plot1 <-
   graph_data %>%
   ggraph::ggraph(layout = 'fr',
                  circular = FALSE) +
-  ggforce::geom_mark_ellipse(
-    aes(x = x,
-        y = y,
-        group = expected_module,
-        color = expected_module),
-    alpha = 1,
-    expand = unit(5, "mm"),
-    linewidth = 1,
-    label.fontsize = 9,
-    con.cap = 0,
-    fill = NA,
-    con.type = "straight",
-    show.legend = TRUE
-  ) +
+  # ggforce::geom_mark_ellipse(
+  #   aes(x = x,
+  #       y = y,
+  #       group = expected_module,
+  #       color = expected_module),
+  #   alpha = 1,
+  #   expand = unit(5, "mm"),
+  #   linewidth = 1,
+  #   label.fontsize = 9,
+  #   con.cap = 0,
+  #   fill = NA,
+  #   con.type = "straight",
+  #   show.legend = TRUE
+  # ) +
   ggraph::geom_edge_link(
     aes(width = sim),
     color = "black",
@@ -888,33 +934,180 @@ p1 <- plot1
 print(p1)
 dev.off()
 
-## Evaluation of clustering ====
-library(clValid)
-node_data <-
-  graph_data %>%
-  tidygraph::activate(what = "nodes") %>%
-  tidygraph::as_tibble()
-cluster_label <-
+# III. Validation of clustering algorithms ====
+hc_cluster_re <- data.frame(node = names(hc_cluster), hc_result = unname(hc_cluster))
+spectrum_cluster_re <- data.frame(node = rownames(sim_matrix), spectrum_result = spectrum_clusters$assignments)
+binary_cut_cluster_re <- data.frame(node = rownames(sim_matrix), binary_cut_result = binary_cut_clusters)
+hc_cluster_dynamic <- data.frame(node = hc$labels, hc_dynamic_result = clustering)
+
+node_data_ <-
   node_data %>%
-  dplyr::select(node, module) %>%
-  dplyr::mutate(module_id = as.numeric(sub(pattern = "Functional_module_", replacement = "", x = module)))
+  dplyr::mutate(true_label = as.numeric(sub(pattern = "Functional_module_", replacement = "", x = expected_module))) %>%
+  dplyr::mutate(edge_btw_result = edge_btw_clusters) %>%
+  dplyr::left_join(hc_cluster_re) %>%
+  dplyr::mutate(markov_result = mcl_res$Cluster) %>%
+  dplyr::left_join(spectrum_cluster_re) %>%
+  dplyr::left_join(binary_cut_cluster_re) %>%
+  dplyr::left_join(hc_cluster_dynamic)
+## 1. Before-revise Adjusted Rand Index ====
+ari_edge_btw <- mclust::adjustedRandIndex(node_data_$true_label, node_data_$edge_btw_result)
+ari_hc <- mclust::adjustedRandIndex(node_data_$true_label, node_data_$hc_result)
+ari_markov <- mclust::adjustedRandIndex(node_data_$true_label, node_data_$markov_result)
+ari_spectrum <- mclust::adjustedRandIndex(node_data_$true_label, node_data_$spectrum_result)
+ari_binarycut <- mclust::adjustedRandIndex(node_data_$true_label, node_data_$binary_cut_result)
 
-# Give single module a cluster label
-module_node <- node_data$node %>% unique()
-single_node <- setdiff(rownames(sim_matrix), module_node)
+aris <- c(ari_edge_btw, ari_hc, ari_markov, ari_spectrum, ari_binarycut)
+aris_sorted <- sort(aris, decreasing = TRUE)
 
-max_id <- max(cluster_label$module_id)  # Current maximum module_id
-new_ids <- seq(max_id + 1, max_id + length(single_node))  # Increment for each new node
+bar_positions <- barplot(aris_sorted,
+                         xlab = "Clustering methods",
+                         ylab = "Adjusted Rand Index",
+                         ylim = c(0, max(aris_sorted) * 1.1),
+                         names.arg = c("Binary cut", "Edge betweeness", "Hierarchical", "Spectrum", "Markov chain")) # Add extra space at the top
 
-new_cluster_label <- data.frame(
-  node = single_node,
-  module = paste0("Functional_module_", seq_along(single_node)),  # Placeholder module names
-  module_id = new_ids
+# Add text labels at the top of each bar
+text(x = bar_positions,
+     y = aris_sorted + max(aris_sorted) * 0.03, # Position slightly above the bar
+     labels = round(aris_sorted, 2), # Round to 2 decimal places
+     cex = 0.9) # Text size
+
+## 2. Revise the true label ====
+### ARI ====
+test <- node_data_
+test$true_label[which(test$expected_module == "Functional_module_10")] <- 8
+
+
+ari_edge_btw <- mclust::adjustedRandIndex(test$true_label, test$edge_btw_result)
+ari_hc <- mclust::adjustedRandIndex(test$true_label, test$hc_result)
+ari_markov <- mclust::adjustedRandIndex(test$true_label, test$markov_result)
+ari_spectrum <- mclust::adjustedRandIndex(test$true_label, test$spectrum_result)
+ari_binarycut <- mclust::adjustedRandIndex(test$true_label, test$binary_cut_result)
+ari_hc_dynamic <- mclust::adjustedRandIndex(test$true_label, test$hc_dynamic_result)
+
+aris <- c(ari_edge_btw, ari_hc, ari_markov, ari_spectrum, ari_binarycut)
+aris_sorted <- sort(aris, decreasing = TRUE)
+
+bar_positions <- barplot(aris_sorted,
+                         xlab = "Clustering methods",
+                         ylab = "Adjusted Rand Index",
+                         ylim = c(0, max(aris_sorted) * 1.1),
+                         names.arg = c("Binary cut", "Edge betweeness", "Hierarchical", "Spectrum", "Markov chain")) # Add extra space at the top
+
+ari_result <- data.frame("Clustering methods" = c("Binary cut", "Girvan Newman", "Hierarchical"),
+                         "Adjusted Rand Index" = c(0.83, 0.73, 0.71))
+ari_result |>
+  ggplot(aes(x = Clustering.methods, y = Adjusted.Rand.Index)) +
+  geom_col(width = 0.6) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(size = 12)   # ← set x‐axis tick label size
+  )  +
+  ggplot2::annotate(
+    "text",
+    x = ari_result$Clustering.methods,
+    y = ari_result$Adjusted.Rand.Index + 0.02,
+    label = sprintf(
+      "%.2f",
+      ari_result$Adjusted.Rand.Index
+    ),
+    hjust = 0.5,
+    vjust = 0,
+    fontface = "bold",
+    size = 4
+  ) +
+  labs(
+    x = "Clustering Methods",
+    y = "Adjusted Rand Index"
+  )
+
+# Add text labels at the top of each bar
+text(x = bar_positions,
+     y = aris_sorted + max(aris_sorted) * 0.03, # Position slightly above the bar
+     labels = round(aris_sorted, 2), # Round to 2 decimal places
+     cex = 0.9) # Text size
+### Jaccard, Folkes_Mallows ====
+clusterCrit::getCriteriaNames(isInternal = TRUE)
+clusterCrit::getCriteriaNames(isInternal = FALSE)
+clusterCrit::extCriteria(as.integer(test$true_label), as.integer(test$edge_btw_result), crit = c("Jaccard", "Folkes_Mallows"))
+clusterCrit::extCriteria(as.integer(test$true_label), as.integer(test$binary_cut_result), crit = c("Jaccard", "Folkes_Mallows"))
+clusterCrit::extCriteria(as.integer(test$true_label), as.integer(test$hc_result), crit = c("Jaccard", "Folkes_Mallows"))
+clusterCrit::extCriteria(as.integer(test$true_label), as.integer(test$markov_result), crit = c("Jaccard", "Folkes_Mallows"))
+clusterCrit::extCriteria(as.integer(test$true_label), as.integer(test$spectrum_result), crit = c("Jaccard", "Folkes_Mallows"))
+
+library(igraph)
+library(aricode)  # For ARI calculation
+
+# Function to perform node-based bootstrap sampling
+bootstrap_graph <- function(g, n_bootstraps = 100) {
+  n_nodes <- vcount(g)
+  bootstrap_samples <- list()
+
+  for (i in 1:n_bootstraps) {
+    # Sample nodes with replacement
+    sampled_nodes <- sample(V(g)$name, size = n_nodes, replace = TRUE)
+
+    # Keep only unique nodes (this will typically be ~63% of original nodes)
+    unique_nodes <- unique(sampled_nodes)
+
+    # Create subgraph with only these unique nodes
+    subgraph <- induced_subgraph(g, unique_nodes)
+
+    # Store the bootstrapped graph
+    bootstrap_samples[[i]] <- subgraph
+  }
+
+  return(bootstrap_samples)
+}
+
+# Function to compare clustering methods
+compare_clustering_methods <- function(g, clustering_methods, n_bootstraps = 100, ground_truth = NULL) {
+  bootstrap_graphs <- bootstrap_graph(g, n_bootstraps)
+
+  # For each bootstrap sample
+  for (i in 1:n_bootstraps) {
+    boot_graph <- bootstrap_graphs[[i]]
+
+    # Apply each clustering method to the bootstrap sample
+    for (method in method_names) {
+      # Apply the clustering method
+      clusters <- clustering_methods[[method]](boot_graph)
+
+      boot_nodes <- V(boot_graph)$name
+      ground_truth_subset <- ground_truth[boot_nodes]
+      results[[method]][i] <- mclust::adjustedRandIndex(clusters, ground_truth_subset)
+    }
+  }
+
+  return(results)
+}
+
+# Example usage:
+# Define your clustering methods as functions that take a graph and return communities
+clustering_methods <- list(
+  "louvain" = function(g) {
+    cluster_louvain(g)$membership
+  },
+  "fast_greedy" = function(g) {
+    cluster_fast_greedy(g)$membership
+  },
+  "edge_betweenness" = function(g) {
+    cluster_edge_betweenness(g)$membership
+  }
 )
 
-cluster_label_with_single <- rbind(cluster_label, new_cluster_label)
+# Run the comparison
+# ari_results <- compare_clustering_methods(your_graph, clustering_methods, n_bootstraps = 100, ground_truth = your_ground_truth)
 
-## reorder label
+# Statistical comparison using ANOVA
+# anova_result <- aov(ARI ~ Method, data = reshape2::melt(ari_results))
+# summary(anova_result)
+
+# Post-hoc tests if ANOVA is significant
+# TukeyHSD(anova_result)
+
+
+## Evaluation of clustering ====
+library(clValid)
 
 cosine_dist <- 1 - openai_semantic_sim_matrix
 cosine_dist_obj <- as.dist(cosine_dist)
