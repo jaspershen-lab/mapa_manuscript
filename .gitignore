@@ -51,8 +51,6 @@ rsconnect/
 2_data
 2_data/
 
-3_data_analysis/02_artificial_data
-3_data_analysis/03_deom_data_embedding_and_clustering_results
 6_data_analysis_intermediate_res
 6_data_analysis_intermediate_res/
 .DS_Store

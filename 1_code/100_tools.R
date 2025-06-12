@@ -5,10 +5,9 @@ library(rio)
 library(data.table)
 library(AnnotationHub)
 
-database_color =
+database_color <-
   c(
-    GO = "#1F77B4FF",
-    KEGG = "#FF7F0EFF",
-    Reactome = "#2CA02CFF"
+    GO = "#eeca40",
+    KEGG = "#fd7541",
+    Reactome = "#23b9c7"
   )
-
