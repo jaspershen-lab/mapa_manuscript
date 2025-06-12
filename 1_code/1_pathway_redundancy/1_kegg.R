@@ -3,7 +3,6 @@ setwd(get_project_wd())
 rm(list = ls())
 source('1_code/100_tools.R')
 
-
 dir.create(
   "3_data_analysis/1_pathway_redundancy/1_kegg",
   showWarnings = FALSE,
@@ -20,29 +19,58 @@ load("pathway.rda")
 
 hsa_pathway <-
   pathway
-hsa_pathway@compound_list[[10]]$KEGG.ID
 
 pathway <-
-  hsa_pathway@compound_list %>%
+  hsa_pathway@gene_list %>%
   lapply(function(x)
     x$KEGG.ID)
 
 names(pathway) <-
   hsa_pathway@pathway_id
 
-# Create a binary incidence matrix
-unique_metabolites <- unique(unlist(pathway))
-incidence_matrix <- sapply(pathway, function(pathway) {
-  as.integer(unique_metabolites %in% pathway)
-})
+##remove NULL pathways
+remove_index <-
+  lapply(pathway, function(x) {
+    is.null(x)
+  }) %>%
+  unlist() %>%
+  which()
 
-# Compute intersection and union using matrix multiplication
-intersection_matrix <- t(incidence_matrix) %*% incidence_matrix
-union_matrix <- outer(rowSums(incidence_matrix), rowSums(incidence_matrix), FUN = "+") - intersection_matrix
+if (length(remove_index) > 0) {
+  pathway <- pathway[-remove_index]
+}
 
-# Compute Jaccard index
-jaccard_matrix <- intersection_matrix / union_matrix
+# Function to calculate Jaccard index
+jaccard_index <- function(a, b) {
+  intersect_len <- length(intersect(a, b))
+  union_len <- length(union(a, b))
+  if (union_len == 0)
+    return(0)
+  return(intersect_len / union_len)
+}
 
-# Display the result
-rownames(jaccard_matrix) <- colnames(jaccard_matrix) <- names(kegg_reference_pathway)
-jaccard_matrix
+# Get pathway names
+pathway_names <- names(pathway)
+
+# Initialize matrix
+n <- length(pathway_names)
+jaccard_matrix <- matrix(0, nrow = n, ncol = n)
+rownames(jaccard_matrix) <- pathway_names
+colnames(jaccard_matrix) <- pathway_names
+
+# Compute pairwise Jaccard indices
+for (i in 1:n) {
+  cat(i, " ")
+  for (j in i:n) {
+    ji <- jaccard_index(pathway[[i]], pathway[[j]])
+    jaccard_matrix[i, j] <- ji
+    jaccard_matrix[j, i] <- ji  # symmetric
+  }
+}
+
+jaccard_matrix[upper.tri(jaccard_matrix)] %>%
+  data.frame(jaccard_index = .) %>%
+  ggplot() +
+  geom_histogram(aes(x = jaccard_index), bins = 50)
+
+
