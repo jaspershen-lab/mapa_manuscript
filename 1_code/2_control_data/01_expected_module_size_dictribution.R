@@ -20,7 +20,7 @@ plot <-
     ) +
     xlab("Expected Functional Module") +
     ylab("Size of Expected Functional Module")
-
+plot
 ggsave(plot = plot,
        filename = "3_data_analysis/02_control_data/01_expected_module_size_dictribution/expected_module_size_dictribution.pdf",
        height = 8,

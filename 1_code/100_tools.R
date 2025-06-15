@@ -11,3 +11,16 @@ database_color <-
     KEGG = "#fd7541",
     Reactome = "#23b9c7"
   )
+
+intra_inter_database_color <-
+  c(
+    intra_database = "#d8d113",
+    inter_database = "#2373cd"
+  )
+
+
+same_different_module_color <-
+  c(
+    same_module = "#ff0000",
+    different_module = "#65684c"
+  )
