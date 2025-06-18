@@ -291,6 +291,48 @@ get_reactome_pathway_info <- function(reactome_ids) {
   return(reactome_info)
 }
 
+get_metkegg_info <- function(kegg_ids) {
+  metkegg_info <- list()
+
+  for (i in 1:length(kegg_ids)) {
+    kegg_id <- kegg_ids[i]
+    ### Get a single KEGG entry
+    entry <- KEGGREST::keggGet(dbentries = kegg_id)[[1]]
+
+
+    # Collect base info (always included)
+    all_info <- list(
+      "id" = unname(entry$ENTRY),
+      # "term_name" = sub(" - Homo sapiens \\(human\\)$", "", entry$NAME),
+      "term_name" = sub(" - [^(]+\\([^)]+\\)$", "", entry$NAME),
+      "term_definition" = paste(entry$DESCRIPTION, collapse = " ")
+    )
+
+    metkegg_info <- c(list(all_info), metkegg_info)
+  }
+
+  return(metkegg_info)
+}
+
+get_smpdb_info <- function(smpdb_ids) {
+  smpdb_pathway_info <- metpath::hmdb_pathway
+  smpdb_info <-
+    smpdb_ids %>%
+    purrr::map(function(x) {
+      indx <- which(smpdb_pathway_info@pathway_id == x)
+      term_name <- smpdb_pathway_info@pathway_name[indx]
+      term_definition <- smpdb_pathway_info@describtion[indx][[1]]
+      annotated_compound_name <- smpdb_pathway_info@compound_list[indx][[1]]$Compound.name
+      list(
+        "id" = x,
+        "term_name" = term_name,
+        "term_definition" = term_definition
+      )
+    })
+
+  return(smpdb_info)
+}
+
 # Combine information (term name, term description, gene names) into a string ====
 combine_info <- function(info) {
   info %>%
