@@ -21,7 +21,7 @@ node_data <-
   control_dt %>%
   dplyr::select(id, everything()) %>%
   dplyr::mutate(expected_module =
-                  stringr::str_replace(expected_module, "Functional_module_", "Module")) %>%
+                  stringr::str_replace(expected_module, "Functional_module_", "Module ")) %>%
   dplyr::mutate(expected_module = factor(expected_module, levels = stringr::str_sort(unique(expected_module), numeric = TRUE)))
 
 edge_data <-
@@ -111,12 +111,12 @@ plot1 <-
 library(extrafont)
 loadfonts()
 plot1
-ggsave(
-  plot = plot1,
-  filename = "raw_modules_network.pdf",
-  width = 10,
-  height = 8
-)
+# ggsave(
+#   plot = plot1,
+#   filename = "raw_modules_network.pdf",
+#   width = 10,
+#   height = 8
+# )
 
 
 # Create network for Girvan-Newman clustering result
@@ -124,7 +124,7 @@ gn_graph_data <-
   gn_graph_data %>%
   activate(nodes) %>%
   dplyr::left_join(layout_df[, c("id", "x", "y")], by = c("node" = "id")) %>%
-  dplyr::mutate(gn_result = paste("Functional module", gn_result, sep = " ")) %>%
+  dplyr::mutate(gn_result = paste("Module", gn_result, sep = " ")) %>%
   dplyr::mutate(gn_result = factor(gn_result, levels = stringr::str_sort(unique(gn_result), numeric = TRUE)))
 
 plot2 <-
@@ -191,19 +191,12 @@ ggsave(
 
 
 
-
-
-
-
-
-
-
 # Create network for binary cut clustering result
 bc_graph_data <-
   bc_graph_data %>%
   activate(nodes) %>%
   dplyr::left_join(layout_df[, c("id", "x", "y")], by = c("node" = "id")) %>%
-  dplyr::mutate(binary_cut_result = paste("Functional module", binary_cut_result, sep = " ")) %>%
+  dplyr::mutate(binary_cut_result = paste("Module", binary_cut_result, sep = " ")) %>%
   dplyr::mutate(binary_cut_result = factor(binary_cut_result, levels = stringr::str_sort(unique(binary_cut_result), numeric = TRUE)))
 
 plot2 <-
@@ -263,6 +256,80 @@ loadfonts()
 ggsave(
   plot = plot2,
   filename = "bc_clustering_network.pdf",
+  width = 10,
+  height = 8
+)
+
+
+
+
+
+
+# Create network for binary cut clustering result
+hc_graph_data <-
+  hc_graph_data %>%
+  activate(nodes) %>%
+  dplyr::left_join(layout_df[, c("id", "x", "y")], by = c("node" = "id")) %>%
+  dplyr::mutate(hc_result = paste("Module", hc_result, sep = " ")) %>%
+  dplyr::mutate(hc_result = factor(hc_result, levels = stringr::str_sort(unique(hc_result), numeric = TRUE)))
+
+plot3 <-
+  ggraph(hc_graph_data,
+         layout = 'manual',
+         x = x,
+         y = y) +
+  ggraph::geom_edge_link(aes(size = sim),
+                         show.legend = TRUE,
+                         color = "black") +
+  ggraph::geom_node_point(
+    aes(
+      size = degree,
+      color = hc_result,
+      shape = database
+    ),
+    alpha = 1,
+    show.legend = TRUE
+  ) +
+  ggforce::geom_mark_ellipse(
+    aes(
+      x = x,
+      y = y,
+      group = hc_result,
+      color = hc_result
+    ),
+    alpha = 1,
+    expand = unit(5, "mm"),
+    linewidth = 1,
+    label.fontsize = 9,
+    con.cap = 0,
+    fill = NA,
+    con.type = "straight",
+    show.legend = TRUE
+  ) +
+  ggraph::geom_node_text(
+    aes(x = x, y = y, label = name),
+    check_overlap = TRUE,
+    size = 3,
+    repel = TRUE
+  ) +
+  # scale_color_manual(values = colors) +
+  scale_size_continuous(range = c(3, 7)) +
+  ggraph::scale_edge_size_continuous(range = c(1, 3)) +
+  ggraph::theme_graph() +
+  theme(
+    plot.background = element_rect(fill = "transparent", color = NA),
+    panel.background = element_rect(fill = "transparent", color = NA),
+    legend.position = "left",
+    legend.background = element_rect(fill = "transparent", color = NA)
+  )
+plot3
+
+library(extrafont)
+loadfonts()
+
+ggsave(
+  plot = plot3,
+  filename = "hc_clustering_network.pdf",
   width = 10,
   height = 8
 )
