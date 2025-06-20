@@ -11,18 +11,13 @@ load("3_data_analysis/02_control_data/04_clustering/bc_graph_data.rda")
 load("3_data_analysis/02_control_data/04_clustering/hc_graph_data.rda")
 load("3_data_analysis/02_control_data/04_clustering/gn_graph_data.rda")
 
-hc_cluster_re <- data.frame(node = names(hc_cluster), hc_result = unname(hc_cluster))
-spectrum_cluster_re <- data.frame(node = rownames(sim_matrix), spectrum_result = spectrum_clusters$assignments)
-binary_cut_cluster_re <- data.frame(node = rownames(sim_matrix), binary_cut_result = binary_cut_clusters)
-hc_cluster_dynamic <- data.frame(node = hc$labels, hc_dynamic_result = clustering)
-
 gn_node_data <- gn_graph_data |> activate(what = "nodes") |> as_tibble()
 
-hc_node_date <- hc_graph_data |> activate(what = "nodes") |> as_tibble()
-hc_cluster_re <- hc_node_date |> select(node, hc_result)
+hc_node_data <- hc_graph_data |> activate(what = "nodes") |> as_tibble()
+hc_cluster_re <- hc_node_data |> select(node, hc_result)
 
-bc_node_date <- bc_graph_data |> activate(what = "nodes") |> as_tibble()
-bc_cluster_re <- bc_node_date |> select(node, binary_cut_result)
+bc_node_data <- bc_graph_data |> activate(what = "nodes") |> as_tibble()
+bc_cluster_re <- bc_node_data |> select(node, binary_cut_result)
 
 node_data <-
   gn_node_data |>
