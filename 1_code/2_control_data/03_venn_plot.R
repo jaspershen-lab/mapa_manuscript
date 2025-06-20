@@ -3,7 +3,7 @@ setwd(get_project_wd())
 rm(list = ls())
 source('1_code/100_tools.R')
 
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/all_gene_list.rda")
+load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/overlap_similarity/all_gene_list.rda")
 
 library(VennDiagram)
 library(grid)

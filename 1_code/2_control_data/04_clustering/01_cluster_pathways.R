@@ -6,8 +6,8 @@ library(tidygraph)
 library(igraph)
 
 control_dt <- readxl::read_excel("2_data/control_data.xlsx", sheet = 1)
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/embedding_sim_df.rda")
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/embedding_sim_matrix.rda")
+load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_df.rda")
+load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_matrix.rda")
 
 # Girvan-Newman clustering ====
 sim.cutoff <- 0.5
