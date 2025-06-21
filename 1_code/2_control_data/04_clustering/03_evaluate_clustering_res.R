@@ -11,6 +11,8 @@ load("3_data_analysis/02_control_data/04_clustering/bc_graph_data.rda")
 load("3_data_analysis/02_control_data/04_clustering/hc_graph_data.rda")
 load("3_data_analysis/02_control_data/04_clustering/gn_graph_data.rda")
 
+setwd("3_data_analysis/02_control_data/04_clustering/")
+
 gn_node_data <- gn_graph_data |> activate(what = "nodes") |> as_tibble()
 
 hc_node_data <- hc_graph_data |> activate(what = "nodes") |> as_tibble()
@@ -26,9 +28,17 @@ node_data <-
   dplyr::left_join(bc_cluster_re, by = "node")
 
 # Calculate Adjusted Rand Index ====
+library(mclust)
 ari_gn <- mclust::adjustedRandIndex(node_data$true_label, node_data$gn_result)
 ari_hc <- mclust::adjustedRandIndex(node_data$true_label, node_data$hc_result)
 ari_bc <- mclust::adjustedRandIndex(node_data$true_label, node_data$binary_cut_result)
+
+node_data %>%
+  dplyr::select(node, true_label, gn_result, hc_result, binary_cut_result)
+
+x <- c(1,1,1,2,2,2,3,3,3)
+y <- c(3,3,2,2,2,4,2,1,1)
+mclust::adjustedRandIndex(x,y)
 
 # aris <- c(ari_gn, ari_hc, ari_markov, ari_spectrum, ari_bc)
 aris <- c("Girvan Newman" = ari_gn, "Hierarchical" = ari_hc, "Binary cut" = ari_bc)
@@ -61,7 +71,7 @@ p <-
     x = "Clustering Methods",
     y = "Adjusted Rand Index"
   )
-
-ggsave(plot = p, filename = "3_data_analysis/02_control_data/04_clustering/clustering_evaluation_plot_ARI.pdf",
+p
+ggsave(plot = p, filename = "clustering_evaluation_plot_ARI.pdf",
        width = 8,
        height = 6)

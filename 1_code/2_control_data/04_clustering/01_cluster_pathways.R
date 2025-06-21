@@ -6,8 +6,14 @@ library(tidygraph)
 library(igraph)
 
 control_dt <- readxl::read_excel("2_data/control_data.xlsx", sheet = 1)
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_df.rda")
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_matrix.rda")
+load(
+  "3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_df.rda"
+)
+load(
+  "3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_matrix.rda"
+)
+
+setwd("3_data_analysis/02_control_data/04_clustering/")
 
 # Girvan-Newman clustering ====
 sim.cutoff <- 0.5
@@ -23,19 +29,34 @@ node_data <-
   dplyr::select(node, expected_module, expected_count, database, name)
 
 graph_data <-
-  tbl_graph(nodes = node_data,
-            edges = edge_data,
-            directed = FALSE,
-            node_key = "node") %>%
+  tbl_graph(
+    nodes = node_data,
+    edges = edge_data,
+    directed = FALSE,
+    node_key = "node"
+  ) %>%
   mutate(degree = centrality_degree())
 
 subnetwork <-
-  suppressWarnings(cluster_edge_betweenness(graph = graph_data,
-                                            weights = abs(edge_attr(graph_data, "sim"))))
+  suppressWarnings(cluster_edge_betweenness(graph = graph_data, weights = abs(edge_attr(graph_data, "sim"))))
 
 # cluster <-
 #   paste("Functional_module", as.character(membership(subnetwork)), sep = "_")
 edge_btw_clusters <- as.numeric(membership(subnetwork))
+
+library(mclust)
+
+node_data$gn_result <-
+  as.character(edge_btw_clusters)
+
+temp_data <-
+  control_dt %>%
+  dplyr::select(id, expected_module) %>%
+  dplyr::mutate(expected_module =
+                  stringr::str_replace(expected_module, "Functional_module_", "")) %>%
+  dplyr::left_join(node_data[, c("node", "gn_result")], by = c("id" = "node"))
+
+mclust::adjustedRandIndex(temp_data$expected_module, temp_data$gn_result)
 
 gn_graph_data <-
   graph_data %>%
@@ -43,7 +64,7 @@ gn_graph_data <-
   tidygraph::activate(what = "nodes") %>%
   dplyr::mutate(gn_result = edge_btw_clusters)
 
-save(gn_graph_data, file = "3_data_analysis/02_control_data/04_clustering/gn_graph_data.rda")
+save(gn_graph_data, file = "gn_graph_data.rda")
 
 # Hierarchical clustering ====
 
@@ -53,7 +74,17 @@ cosine_dist_obj <- as.dist(cosine_dist)
 
 hc <- hclust(cosine_dist_obj, method = "complete")
 hc_cluster <- cutree(hc, k = 9)
-hc_cluster_res <- data.frame(node = names(hc_cluster), hc_result = unname(hc_cluster))
+hc_cluster_res <- data.frame(node = names(hc_cluster),
+                             hc_result = unname(hc_cluster))
+
+temp_data <-
+  control_dt %>%
+  dplyr::select(id, expected_module) %>%
+  dplyr::mutate(expected_module =
+                  stringr::str_replace(expected_module, "Functional_module_", "")) %>%
+  dplyr::left_join(hc_cluster_res[, c("node", "hc_result")], by = c("id" = "node"))
+
+mclust::adjustedRandIndex(temp_data$expected_module, as.character(temp_data$hc_result))
 
 # hc_clusters <-
 #   paste("Functional_module", as.character(hc_cluster[node_data$node]), sep = "_")
@@ -74,10 +105,12 @@ node_data <-
   dplyr::select(node, expected_module, expected_count, database, name)
 
 hc_graph_data <-
-  tbl_graph(nodes = node_data,
-            edges = edge_data,
-            directed = FALSE,
-            node_key = "node") |>
+  tbl_graph(
+    nodes = node_data,
+    edges = edge_data,
+    directed = FALSE,
+    node_key = "node"
+  ) |>
   mutate(degree = centrality_degree())
 
 hc_graph_data <-
@@ -86,6 +119,8 @@ hc_graph_data <-
   tidygraph::activate(what = "nodes") %>%
   dplyr::left_join(hc_cluster_res, by = "node")
 
+
+###? what does this mean?
 hc_graph_data <-
   hc_graph_data %>%
   activate(what = "edges") %>%
@@ -120,13 +155,24 @@ save(hc_graph_data, file = "3_data_analysis/02_control_data/04_clustering/hc_gra
 ## 1. Clustering ====
 library(simplifyEnrichment)
 
-binary_cut_clusters <- simplifyEnrichment::binary_cut(mat = embedding_sim_matrix,
-                                                      cutoff = 0.7)
+binary_cut_clusters <- simplifyEnrichment::binary_cut(mat = embedding_sim_matrix, cutoff = 0.7)
 levels(as.factor(binary_cut_clusters))
 simplifyEnrichment::plot_binary_cut(mat = embedding_sim_matrix, cutoff = 0.7)
 
 # binary_cut_clusters <- paste("Functional_module", as.character(binary_cut_clusters), sep = "_")
-binary_cut_res <- data.frame(node = rownames(embedding_sim_matrix), binary_cut_result = binary_cut_clusters)
+binary_cut_res <- data.frame(node = rownames(embedding_sim_matrix),
+                             binary_cut_result = binary_cut_clusters)
+
+
+temp_data <-
+  control_dt %>%
+  dplyr::select(id, expected_module) %>%
+  dplyr::mutate(expected_module =
+                  stringr::str_replace(expected_module, "Functional_module_", "")) %>%
+  dplyr::left_join(binary_cut_res[, c("node", "binary_cut_result")], by = c("id" = "node"))
+
+mclust::adjustedRandIndex(temp_data$expected_module, as.character(temp_data$binary_cut_result))
+
 
 ## 2. Create graph object
 edge_data <- embedding_sim_df
@@ -137,10 +183,12 @@ node_data <-
   dplyr::select(node, expected_module, expected_count, database, name)
 
 bc_graph_data <-
-  tbl_graph(nodes = node_data,
-            edges = edge_data,
-            directed = FALSE,
-            node_key = "node") |>
+  tbl_graph(
+    nodes = node_data,
+    edges = edge_data,
+    directed = FALSE,
+    node_key = "node"
+  ) |>
   mutate(degree = centrality_degree())
 
 bc_graph_data <-
@@ -158,4 +206,4 @@ bc_graph_data <-
       .N()$binary_cut_result[to]
   )
 
-save(bc_graph_data, file = "3_data_analysis/02_control_data/04_clustering/bc_graph_data.rda")
+save(bc_graph_data, file = "bc_graph_data.rda")
