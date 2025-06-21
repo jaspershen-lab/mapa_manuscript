@@ -13,7 +13,70 @@ load(
   "3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_matrix.rda"
 )
 
-setwd("3_data_analysis/02_control_data/04_clustering/")
+setwd("3_data_analysis/02_control_data/04_clustering_permutation/")
+
+
+####permutation
+true_module <- control_dt %>%
+  dplyr::select(id, expected_module)
+
+for (i in 1:100) {
+  cat(i, " ")
+
+  idx <-
+    sample(1:nrow(true_module), nrow(true_module), replace = TRUE) %>%
+    unique() %>%
+    sort()
+
+  temp_true_module <- true_module[idx, ]
+
+  sim.cutoff <- 0.5
+
+  edge_data <-
+    embedding_sim_df %>%
+    dplyr::filter(sim > sim.cutoff) %>%
+    dplyr::filter(from %in% temp_true_module$id &
+                    to %in% temp_true_module$id)
+
+  node_data <-
+    control_dt %>%
+    # dplyr::filter(id %in% edge_data$from | id %in% edge_data$to) %>%
+    dplyr::rename(node = id) %>%
+    dplyr::select(node, expected_module, expected_count, database, name) %>%
+    dplyr::filter(node %in% temp_true_module$id)
+
+  graph_data <-
+    tbl_graph(
+      nodes = node_data,
+      edges = edge_data,
+      directed = FALSE,
+      node_key = "node"
+    ) %>%
+    mutate(degree = centrality_degree())
+
+  subnetwork <-
+    suppressWarnings(cluster_edge_betweenness(graph = graph_data, weights = abs(edge_attr(graph_data, "sim"))))
+
+  # cluster <-
+  #   paste("Functional_module", as.character(membership(subnetwork)), sep = "_")
+  edge_btw_clusters <- as.numeric(membership(subnetwork))
+
+  library(mclust)
+
+  node_data$gn_result <-
+    as.character(edge_btw_clusters)
+
+  temp_data <-
+    control_dt %>%
+    dplyr::select(id, expected_module) %>%
+    dplyr::mutate(expected_module =
+                    stringr::str_replace(expected_module, "Functional_module_", "")) %>%
+    dplyr::left_join(node_data[, c("node", "gn_result")], by = c("id" = "node"))
+
+  mclust::adjustedRandIndex(temp_data$expected_module, temp_data$gn_result)
+
+}
+
 
 # Girvan-Newman clustering ====
 sim.cutoff <- 0.5
