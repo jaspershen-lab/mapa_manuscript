@@ -15,7 +15,6 @@ load(
 
 setwd("3_data_analysis/02_control_data/04_clustering_permutation/")
 
-
 ####permutation
 true_module <- control_dt %>%
   dplyr::select(id, expected_module)
@@ -24,7 +23,8 @@ for (i in 1:100) {
   cat(i, " ")
 
   idx <-
-    sample(1:nrow(true_module), nrow(true_module), replace = TRUE) %>%
+    sample(1:length(unique(true_module$expected_module)),
+           length(unique(true_module$expected_module)), replace = TRUE) %>%
     unique() %>%
     sort()
 
