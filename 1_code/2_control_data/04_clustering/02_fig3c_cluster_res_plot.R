@@ -56,7 +56,7 @@ raw_graph_data <- raw_graph_data %>%
   mutate(x = layout_df$x, y = layout_df$y)
 
 # colors <- colorRampPalette(ggsci::pal_lancet()(n = 9))(12)
-
+library(paletteer)
 colors <- rev(paletteer_d("PrettyCols::Rainbow"))
 
 plot1 <-
@@ -105,7 +105,7 @@ plot1 <-
   theme(
     plot.background = element_rect(fill = "transparent", color = NA),
     panel.background = element_rect(fill = "transparent", color = NA),
-    legend.position = "left",
+    legend.position = "bottom",
     legend.background = element_rect(fill = "transparent", color = NA)
   )
 
@@ -179,7 +179,7 @@ plot2 <-
   theme(
     plot.background = element_rect(fill = "transparent", color = NA),
     panel.background = element_rect(fill = "transparent", color = NA),
-    legend.position = "left",
+    legend.position = "bottom",
     legend.background = element_rect(fill = "transparent", color = NA)
   )
 plot2
@@ -244,12 +244,12 @@ plot2 <-
   ) +
   scale_color_manual(values = colors) +
   scale_size_continuous(range = c(3, 7)) +
-  ggraph::scale_edge_width_continuous(range = c(0.5, 3)) +
+  ggraph::scale_edge_width_continuous(range = c(0.2, 1.5)) +
   ggraph::theme_graph() +
   theme(
     plot.background = element_rect(fill = "transparent", color = NA),
     panel.background = element_rect(fill = "transparent", color = NA),
-    legend.position = "left",
+    legend.position = "bottom",
     legend.background = element_rect(fill = "transparent", color = NA)
   )
 plot2
@@ -323,7 +323,7 @@ plot3 <-
   theme(
     plot.background = element_rect(fill = "transparent", color = NA),
     panel.background = element_rect(fill = "transparent", color = NA),
-    legend.position = "left",
+    legend.position = "bottom",
     legend.background = element_rect(fill = "transparent", color = NA)
   )
 plot3
@@ -392,7 +392,7 @@ plot4 <-
   theme(
     plot.background = element_rect(fill = "transparent", color = NA),
     panel.background = element_rect(fill = "transparent", color = NA),
-    legend.position = "left",
+    legend.position = "bottom",
     legend.background = element_rect(fill = "transparent", color = NA)
   )
 plot4
