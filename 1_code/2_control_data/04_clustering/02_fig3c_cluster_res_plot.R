@@ -10,6 +10,8 @@ load("3_data_analysis/02_control_data/04_clustering/gn_graph_data.rda")
 load("3_data_analysis/02_control_data/04_clustering/bc_graph_data.rda")
 load("3_data_analysis/02_control_data/04_clustering/hc_graph_data.rda")
 
+load("3_data_analysis/02_control_data/04_clustering/louvain_graph_data.rda")
+
 setwd("3_data_analysis/02_control_data/04_clustering/")
 
 module_info <-
@@ -53,7 +55,9 @@ raw_graph_data <- raw_graph_data %>%
   activate(nodes) %>%
   mutate(x = layout_df$x, y = layout_df$y)
 
-colors <- colorRampPalette(ggsci::pal_lancet()(n = 9))(12)
+# colors <- colorRampPalette(ggsci::pal_lancet()(n = 9))(12)
+
+colors <- rev(paletteer_d("PrettyCols::Rainbow"))
 
 plot1 <-
   ggraph(raw_graph_data,
@@ -96,7 +100,7 @@ plot1 <-
   ) +
   scale_color_manual(values = colors) +
   scale_size_continuous(range = c(3, 7)) +
-  ggraph::scale_edge_color_manual(values = c("within" = "#ADB6B6", "cross" = "red")) +
+  ggraph::scale_edge_color_manual(values = c("within" = "grey", "cross" = "#D24F00")) +
   ggraph::theme_graph() +
   theme(
     plot.background = element_rect(fill = "transparent", color = NA),
@@ -104,6 +108,8 @@ plot1 <-
     legend.position = "left",
     legend.background = element_rect(fill = "transparent", color = NA)
   )
+
+plot1
 library(extrafont)
 loadfonts()
 plot1
@@ -114,6 +120,10 @@ ggsave(
   height = 8
 )
 
+library(Cairo)
+CairoPDF("raw_modules_network.pdf", width = 12, height = 10)
+plot1
+dev.off()
 
 # Create network for Girvan-Newman clustering result
 gn_graph_data <-
@@ -183,6 +193,81 @@ ggsave(
   width = 10,
   height = 8
 )
+
+louvain_graph_data <-
+  louvain_graph_data %>%
+  activate(nodes) %>%
+  dplyr::left_join(layout_df[, c("id", "x", "y")], by = c("node" = "id")) %>%
+  dplyr::mutate(louvain_result = paste("Module", louvain_result, sep = " ")) %>%
+  dplyr::mutate(module = factor(louvain_result, levels = stringr::str_sort(unique(louvain_result), numeric = TRUE)))
+
+colors <- rev(paletteer_d("MetBrewer::Signac"))
+
+plot2 <-
+  ggraph(louvain_graph_data,
+         layout = 'manual',
+         x = x,
+         y = y) +
+  ggraph::geom_edge_link(aes(edge_width = weight),
+                         show.legend = TRUE,
+                         color = "#ADB6B6") +
+  ggraph::geom_node_point(
+    aes(
+      size = degree,
+      color = module,
+      shape = database
+    ),
+    alpha = 1,
+    show.legend = TRUE
+  ) +
+  ggforce::geom_mark_ellipse(
+    aes(
+      x = x,
+      y = y,
+      group = module,
+      color = module
+    ),
+    alpha = 1,
+    expand = unit(5, "mm"),
+    linewidth = 1,
+    label.fontsize = 9,
+    con.cap = 0,
+    fill = NA,
+    con.type = "straight",
+    show.legend = TRUE
+  ) +
+  ggraph::geom_node_text(
+    aes(x = x, y = y, label = name),
+    check_overlap = FALSE,
+    size = 3,
+    repel = FALSE
+  ) +
+  scale_color_manual(values = colors) +
+  scale_size_continuous(range = c(3, 7)) +
+  ggraph::scale_edge_width_continuous(range = c(0.5, 3)) +
+  ggraph::theme_graph() +
+  theme(
+    plot.background = element_rect(fill = "transparent", color = NA),
+    panel.background = element_rect(fill = "transparent", color = NA),
+    legend.position = "left",
+    legend.background = element_rect(fill = "transparent", color = NA)
+  )
+plot2
+
+library(extrafont)
+loadfonts()
+
+ggsave(
+  plot = plot2,
+  filename = "louvain_clustering_network.pdf",
+  width = 10,
+  height = 8
+)
+
+library(Cairo)
+CairoPDF("louvain_clustering_network.pdf", width = 12, height = 10)
+plot2
+dev.off()
 
 # Create network for binary cut clustering result
 bc_graph_data <-

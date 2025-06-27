@@ -4,6 +4,8 @@ library(ggplot2)
 library(rio)
 library(data.table)
 library(AnnotationHub)
+library(ggthemes)
+library(paletteer)
 
 database_color <-
   c(
@@ -24,3 +26,6 @@ same_different_module_color <-
     same_module = "#ff0000",
     different_module = "#65684c"
   )
+
+# clustering algorithms color
+class_colors <- c("Distance_based" = "#1BB6AFFF", "Graph_based" = "#FFAD0AFF")
