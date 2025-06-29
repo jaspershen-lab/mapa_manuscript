@@ -29,3 +29,10 @@ same_different_module_color <-
 
 # clustering algorithms color
 class_colors <- c("Distance_based" = "#1BB6AFFF", "Graph_based" = "#FFAD0AFF")
+
+
+real_random_module_color <-
+  c(
+    Real = "#e53ba4",
+    Random = "#084d68"
+  )
