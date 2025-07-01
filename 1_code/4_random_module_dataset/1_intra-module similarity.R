@@ -89,5 +89,5 @@ plot <-
 plot
 ggsave(plot = plot,
        filename = "intra_module_similarity.pdf",
-       height = 7,
+       height = 6,
        width = 8)
