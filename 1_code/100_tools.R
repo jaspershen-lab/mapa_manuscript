@@ -11,7 +11,8 @@ database_color <-
   c(
     GO = "#eeca40",
     KEGG = "#fd7541",
-    Reactome = "#23b9c7"
+    Reactome = "#23b9c7",
+    SMPDB = "#7998ad"
   )
 
 intra_inter_database_color <-
