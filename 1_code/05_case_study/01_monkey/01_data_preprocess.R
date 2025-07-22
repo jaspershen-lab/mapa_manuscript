@@ -11,6 +11,9 @@ dt <- import("2_data/case_study/01_monkey/mmc2.xlsx",
 
 setwd("2_data/case_study/01_monkey/")
 
+dt <- as.data.table(dt)
+tissue_specific_info <- dt[Cluster %in% c("Cluster U", "Cluster D"), .N, by = .(Tissue, Cluster)]
+
 dt <- dt |> rename(ensembl = GeneID)
 
 # cluster U
@@ -141,6 +144,9 @@ m_dt_down <- m_dt_match_with_keggid |> dplyr::filter(Cluster == "Cluster D")
 sum(is.na(m_dt_down$keggid))
 m_dt_down <- m_dt_down |> dplyr::filter(!is.na(keggid)) |> distinct(keggid, .keep_all = TRUE)
 
+m_dt_u_d <- m_dt_match_with_keggid |> dplyr::filter(Cluster %in% c("Cluster U", "Cluster D"))
+
+export(m_dt_u_d, file = "2_data/case_study/01_monkey/03_metabolomics/m_dt_u_d.xlsx")
 # 04_sn_rna_seq_brain ====
 brain_rna_seq_dt <- import(
   "2_data/case_study/01_monkey/04_sn_rnaseq/mmc4.xlsx",

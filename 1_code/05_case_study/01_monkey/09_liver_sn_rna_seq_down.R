@@ -171,4 +171,20 @@ setwd(get_project_wd())
 save(llm_interpreted_fm_res, file = "2_data/case_study/01_monkey/05_llm_interpreted_result/04_sn_rna_seq_liver_down_llm_interpreted_fm_res.rda")
 
 ## Step5: Result visualization ====
+load("2_data/case_study/01_monkey/05_llm_interpreted_result/04_sn_rna_seq_liver_down_llm_interpreted_fm_res.rda")
+setwd("3_data_analysis/05_case_study/01_monkey/")
 
+plot <- plot_similarity_network(
+  object = llm_interpreted_fm_res,
+  level = "functional_module",
+  database = c("go", "kegg"),
+  degree_cutoff = 2,
+  llm_text = TRUE
+)
+
+plot
+
+library(Cairo)
+CairoPDF("result_visualization/04_sn_rna_seq_liver_down_functional_module_network.pdf", width = 12, height = 8)
+plot
+dev.off()
