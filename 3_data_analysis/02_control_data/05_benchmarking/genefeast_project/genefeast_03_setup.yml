@@ -1,0 +1,11 @@
+FEAs:
+    - id: "FEA_1"
+      goi_file: "genefeast_02_gol.csv"
+      fea_file: "genefeast_01_enrichment_result_short_gene.csv"
+
+MIN_NUM_GENES: 1
+# MIN_WEIGHT_TT_EDGE: 0.2
+MAX_DCNT: 2000
+# MIN_LEVEL: 3
+# COMBINE_TERM_TYPES: True
+# TOOLTIPS: True

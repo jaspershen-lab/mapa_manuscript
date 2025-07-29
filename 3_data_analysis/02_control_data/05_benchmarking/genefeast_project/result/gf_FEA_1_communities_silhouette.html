@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.title {
+  margin: 5px;
+}
+.view-button {
+  padding: 5;
+  border: none;
+  font: inherit;
+  color: white;
+  cursor: pointer;
+  background-color: dodgerblue;
+  border-radius: 20px;
+  transition-duration: 0.1s;
+}
+.grid-container {
+  display: grid;
+  grid-template-areas:
+    'report_title'
+    'meta_communities'
+    'singleton_meta_communities'
+    'singleton_communities';
+  grid-gap: 10px;
+  background-color: #0aa8a8;
+  padding: 10px;
+}
+.report_title{ grid-area: report_title; }
+.meta_communities { grid-area: meta_communities;
+                    overflow: scroll;}
+.singleton_meta_communities { grid-area: singleton_meta_communities;
+                         overflow: scroll;}
+.singleton_communities { grid-area: singleton_communities;
+                              overflow: scroll;}
+.grid-container > div {
+  max-height: 760px;
+  overflow: scroll;
+  background-color: rgba(255, 255, 255, 0.8);
+  text-align: left;
+  padding: 15px;
+  font-size: small;
+  margin:0;
+}
+.navgrid-container {
+display: grid;
+grid-template-columns: auto;
+position: fixed; top: 0; left: 0; width:100%; height: 55px; z-index:1;
+}
+ul {
+list-style-type: none;
+margin: 0;
+padding: 0;
+background-color: #088F8F;
+top: 0; left: 0; width: 100%; height: 55px; z-index:1;
+}
+li {
+  float: left;
+}
+li a {
+  display: block;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+.navactive {
+  text-decoration:underline;
+}
+.logo {
+  display: block;
+  color: yellow;
+  text-align: center;
+  text-decoration: none;
+  padding: 9px 16px;
+  padding-right: 75px;
+  font-family: arial black, sans-serif;
+  font-size: 18px;
+}
+.rightlink {
+  float: right;
+}
+.subnav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #0aa8a8;
+}
+.dropdown {
+  float: left;
+  overflow: hidden;
+}
+.dropdown .dropbtn {
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  font-weight: bold;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+.dropbtnactive {
+  font-size: 16px;
+  border: none;
+  outline: none;
+  color: white;
+  text-decoration:underline;
+  font-weight: bold;
+  padding: 14px 16px;
+  background-color: inherit;
+  font-family: inherit;
+  margin: 0;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #0aa8a8;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+.dropdown-content a {
+  float: none;
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+  font-size: small;
+}
+.dropdown-content a:hover {
+  background-color: #088F8F;
+}
+.dropdown:hover .dropdown-content {
+  display: block;
+  position:fixed;
+  z-index: 9999;
+}
+
+.dropdownsub {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdown-content .dropdownsub {
+  float: none;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdownsub-content{
+  display: none;
+  position: absolute;
+  background-color: #0aa8a8;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdownsub-content a {
+  float: none;
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+  font-size: small;
+}
+
+.dropdownsub:hover .dropdownsub-content {
+  display: block;
+  position:absolute;
+  z-index: 9999;
+  left: 50%;
+}
+
+.dropdownsubsub {
+  float: left;
+  overflow: hidden;
+}
+
+.dropdownsub-content .dropdownsubsub {
+  float: none;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.dropdownsubsub-content{
+  display: none;
+  position: absolute;
+  background-color: #0aa8a8;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+}
+
+.dropdownsubsub-content a {
+  float: none;
+  color: white;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+  font-size: small;
+}
+
+.dropdownsubsub:hover .dropdownsubsub-content {
+  display: block;
+  position:absolute;
+  z-index: 9999;
+  left: 50%;
+}
+
+.subtitlebanner {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #0aa8a8;
+  margin-top:110px;
+  z-index:1
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.buttontooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 500px;
+  background-color: grey;
+  color: white;
+  text-align: justify;
+  border-radius: 6px;
+  padding: 5px 5px;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+.buttontooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  opacity: 0.4;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: 70%;
+  left: 50%;
+  margin-left: -100px;
+}
+
+.buttontooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+</style>
+</head>
+<body style="background-color:#0aa8a8; font-family: arial, sans-serif;">
+<div class="navgrid-container">
+<div>
+<ul>
+<li class="logo">GeneFEAST</li>
+</ul>
+</div>
+<div>
+<ul class="subnav">
+<li class="dropdown">
+<button class="dropbtnactive" onclick="document.location='GeneFEAST_REPORT_FEA_1.html'">Communities overview</button>
+<div class="dropdown-content">
+<a href="GeneFEAST_REPORT_FEA_1.html">Meta communities, communities, and terms</a>
+<a href="gf_FEA_1_communities_silhouette.html">Silhouette plot</a>
+<div class="dropdownsub" style="width:450px">
+<a href="javascript:;">Graphical grid search of community detection parameters</a>
+<div class="dropdownsub-content" style="width:450px">
+<a href="gf_FEA_1_communities_paramcomparison_oc.html">Graphical grid search of community detection parameters (OC)</a>
+<a href="gf_FEA_1_communities_paramcomparison_ji.html">Graphical grid search of community detection parameters (JI)</a>
+</div>
+</div>
+</div>
+</li> 
+<li class="dropdown">
+<button class="dropbtn" onclick="document.location='gf_FEA_1.html'">Full report</button>
+<div class="dropdown-content">
+<a href="#">Meta communities</a>
+<div class="dropdownsub" style="width:300px">
+<a href="gf_FEA_1.html#community 01 (GO)">Communities</a>
+<div class="dropdownsub-content" style="width:600px;max-height:200px;overflow:scroll;">
+<a href="gf_FEA_1.html#community 01 (GO)">community 01 (GO) GO:0004674 - protein serine/threonine kinase activity</a>
+<a href="gf_FEA_1.html#community 02 (GO)">community 02 (GO) GO:0006633 - fatty acid biosynthetic process</a>
+<a href="gf_FEA_1.html#community 03 (GO)">community 03 (GO) GO:0009055 - electron transfer activity</a>
+<a href="gf_FEA_1.html#community 04 (GO)">community 04 (GO) GO:0061630 - ubiquitin protein ligase activity</a>
+</div>
+</div>
+<div class="dropdownsub" style="width:300px">
+<a href="gf_FEA_1.html#GO:0000165">Terms</a>
+<div class="dropdownsub-content" style="width:600px;max-height:200px;overflow:scroll;">
+<a href="gf_FEA_1.html#GO:0000165">GO:0000165 - MAPK cascade</a>
+<a href="gf_FEA_1.html#GO:0002250">GO:0002250 - adaptive immune response</a>
+<a href="gf_FEA_1.html#GO:0042761">GO:0042761 - very long-chain fatty acid biosynthetic process</a>
+<a href="gf_FEA_1.html#GO:0051146">GO:0051146 - striated muscle cell differentiation</a>
+<a href="gf_FEA_1.html#GO:0051147">GO:0051147 - regulation of muscle cell differentiation</a>
+<a href="gf_FEA_1.html#GO:0051148">GO:0051148 - negative regulation of muscle cell differentiation</a>
+<a href="gf_FEA_1.html#GO:0051153">GO:0051153 - regulation of striated muscle cell differentiation</a>
+<a href="gf_FEA_1.html#GO:0051154">GO:0051154 - negative regulation of striated muscle cell differentiation</a>
+<a href="gf_FEA_1.html#GO:0070371">GO:0070371 - ERK1 and ERK2 cascade</a>
+<a href="gf_FEA_1.html#GO:0098978">GO:0098978 - glutamatergic synapse</a>
+<a href="gf_FEA_1.html#GO:0098985">GO:0098985 - asymmetric, glutamatergic, excitatory synapse</a>
+</div>
+</div>
+</div>
+</li>
+<li class="rightlink"><a style="color:white;">FEA_1</a></li>
+</ul>
+</div>
+</div>
+<div class="subtitlebanner">
+<li><a style="color:black;">Silhouette plot of communities identified in FEA_1</a></li>
+</div>
+<div class="grid-container">
+<div class="figure">
+<img src="images_FEA_1_AUTO/_sil_plot.png" width="916" height="750.0">
+</div>
+</div>
+<script>
+var coll = document.getElementsByClassName("tooltiptext");
+var i;
+for (i = 0; i < coll.length; i++) {
+  coll[i].style.display="none";}
+</script>
+</body>
+</html>

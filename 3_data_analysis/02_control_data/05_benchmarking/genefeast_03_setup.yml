@@ -1,0 +1,4 @@
+FEAs:
+    - id: "FEA_1"
+      goi_file: "genefeast_02_gol"
+      fea_file: "genefeast_01_enrichment_result"

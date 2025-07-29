@@ -1,5 +1,5 @@
 library(mapa)
-# library(tidyverse)
+library(tidyverse)
 library(dplyr)
 library(tidyr)
 library(purrr)
@@ -41,3 +41,10 @@ real_random_module_color <-
     Real = "#e53ba4",
     Random = "#084d68"
   )
+
+methods <- c(
+  "mapa_cluster_label" = "#DD5129FF",
+  "apear_cluster_label" = "#0F7BA2FF",
+  "paver_cluster_label" = "#43B284FF",
+  "enrich_plot_cluster_label" = "#FAB255FF"
+)
