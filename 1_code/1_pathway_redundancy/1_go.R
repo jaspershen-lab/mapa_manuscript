@@ -16,60 +16,59 @@ library(AnnotationDbi)
 library(tidyverse)
 
 
-# Get GO term annotations
-go_data <- as.data.frame(org.Hs.egGO)
+# # Get GO term annotations
+# go_data <- as.data.frame(org.Hs.egGO)
+#
+# # Filter only "BP", "MF", or "CC"
+# bp_data <-
+#   go_data %>%
+#   dplyr::filter(Ontology == "BP")
+#
+# mf_data <-
+#   go_data %>%
+#   dplyr::filter(Ontology == "MF")
+#
+# cc_data <-
+#   go_data %>%
+#   dplyr::filter(Ontology == "CC")
+#
+#
+# # Helper to build list: GO ID -> list of Entrez gene IDs
+# make_go_list <- function(df) {
+#   split(df$gene_id, df$go_id)
+# }
+#
+# go2gene_bp <- make_go_list(bp_data)
+# go2gene_mf <- make_go_list(mf_data)
+# go2gene_cc <- make_go_list(cc_data)
+#
+#
+# # Optional: filter out GO terms with <2 genes
+# go2gene_bp <- go2gene_bp[sapply(go2gene_bp, length) >= 10]
+# go2gene_mf <- go2gene_mf[sapply(go2gene_mf, length) >= 10]
+# go2gene_cc <- go2gene_cc[sapply(go2gene_cc, length) >= 10]
 
-# Filter only "BP", "MF", or "CC"
-bp_data <-
-  go_data %>%
-  dplyr::filter(Ontology == "BP")
-
-mf_data <-
-  go_data %>%
-  dplyr::filter(Ontology == "MF")
-
-cc_data <-
-  go_data %>%
-  dplyr::filter(Ontology == "CC")
-
-
-# Helper to build list: GO ID -> list of Entrez gene IDs
-make_go_list <- function(df) {
-  split(df$gene_id, df$go_id)
-}
-
-go2gene_bp <- make_go_list(bp_data)
-go2gene_mf <- make_go_list(mf_data)
-go2gene_cc <- make_go_list(cc_data)
-
-
-# Optional: filter out GO terms with <2 genes
-go2gene_bp <- go2gene_bp[sapply(go2gene_bp, length) >= 10]
-go2gene_mf <- go2gene_mf[sapply(go2gene_mf, length) >= 10]
-go2gene_cc <- go2gene_cc[sapply(go2gene_cc, length) >= 10]
-
-
-library(GOSemSim)
 
 library(GOSemSim)
-hsGO <- godata('org.Hs.eg.db', ont = "MF")
-
 
 #####BP
 # Use Biological Process (BP)
 hsGO_BP <- godata('org.Hs.eg.db', ont = "BP", computeIC = TRUE)
 
 # Option 1: All-vs-all matrix
-go_terms <-
-  names(go2gene_bp)
+# go_terms <-
+#   names(go2gene_bp)
 
-# sem_matrix_bp <- mgoSim(
-#   go_terms,
-#   go_terms,
-#   semData = hsGO_BP,
-#   measure = "Wang",
-#   combine=NULL
-# )
+go_terms_bp <- unique(hsGO_BP@geneAnno$GO)
+## NOTE: "Wang" is IC-based methods. For IC-based methods, information of GO term is species specific.
+sem_matrix_bp <- mgoSim(
+  go_terms_bp,
+  go_terms_bp,
+  semData = hsGO_BP,
+  measure = "Wang",
+  combine= NULL
+)
+
 #
 # save(sem_matrix_bp, file = "sem_matrix_bp.rda")
 
