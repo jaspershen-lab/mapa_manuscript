@@ -56,10 +56,10 @@ library(GOSemSim)
 hsGO_BP <- godata('org.Hs.eg.db', ont = "BP", computeIC = TRUE)
 
 # Option 1: All-vs-all matrix
-# go_terms <-
-#   names(go2gene_bp)
+go_terms <-
+  names(go2gene_bp)
 
-go_terms_bp <- unique(hsGO_BP@geneAnno$GO)
+# go_terms_bp <- unique(hsGO_BP@geneAnno$GO)
 ## NOTE: "Wang" is IC-based methods. For IC-based methods, information of GO term is species specific.
 sem_matrix_bp <- mgoSim(
   go_terms_bp,
@@ -74,27 +74,35 @@ sem_matrix_bp <- mgoSim(
 
 ###MF
 
-# hsGO_MF <- godata('org.Hs.eg.db', ont = "MF", computeIC = TRUE)
-#
-# sem_matrix_mf <- mgoSim(
-#   go_terms,
-#   go_terms,
-#   semData = hsGO_MF,
-#   measure = "Wang",
-#   combine=NULL
-# )
-# save(sem_matrix_mf, file = "sem_matrix_mf.rda")
+hsGO_MF <- godata('org.Hs.eg.db', ont = "MF", computeIC = TRUE)
+
+go_terms <-
+  names(go2gene_mf)
+
+sem_matrix_mf <- mgoSim(
+  go_terms,
+  go_terms,
+  semData = hsGO_MF,
+  measure = "Wang",
+  combine=NULL
+)
+
+save(sem_matrix_mf, file = "sem_matrix_mf.rda")
 
 ##CC
-# hsGO_CC <- godata('org.Hs.eg.db', ont = "CC", computeIC = TRUE)
-# sem_matrix_cc <- mgoSim(
-#   go_terms,
-#   go_terms,
-#   semData = hsGO_CC,
-#   measure = "Wang",
-#   combine=NULL
-# )
-# save(sem_matrix_cc, file = "sem_matrix_cc.rda")
+hsGO_CC <- godata('org.Hs.eg.db', ont = "CC", computeIC = TRUE)
+
+go_terms <- names(go2gene_cc)
+
+sem_matrix_cc <- mgoSim(
+  go_terms,
+  go_terms,
+  semData = hsGO_CC,
+  measure = "Wang",
+  combine=NULL
+)
+
+save(sem_matrix_cc, file = "sem_matrix_cc.rda")
 
 
 
@@ -120,7 +128,7 @@ plot <-
     zoom.size = 0.5,
     show.area = TRUE
   )
-
+plot
 ggsave(plot,
        filename = "sem_matrix_bp_histogram.pdf",
        width = 10,
@@ -133,13 +141,13 @@ plot <-
   ggplot() +
   geom_histogram(aes(x = value),
                  color = "black",
-                 fill = database_color["GO"],
+                 fill = "#1f77b4",
                  bins = 50) +
   theme_bw() +
   labs(x = "Semantic Similarity", y = "Frequency") +
   ggforce::facet_zoom(
     xlim = c(0.4, 1),
-    ylim = c(0, 15000),
+    ylim = c(0, 35000),
     zoom.size = 0.5,
     show.area = TRUE
   )
@@ -157,13 +165,13 @@ plot <-
   ggplot() +
   geom_histogram(aes(x = value),
                  color = "black",
-                 fill = database_color["GO"],
+                 fill = "#1f77b4",
                  bins = 50) +
   theme_bw() +
   labs(x = "Semantic Similarity", y = "Frequency") +
   ggforce::facet_zoom(
     xlim = c(0.4, 1),
-    ylim = c(0, 15000),
+    ylim = c(0, 25000),
     zoom.size = 0.5,
     show.area = TRUE
   )

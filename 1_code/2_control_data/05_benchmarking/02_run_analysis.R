@@ -485,3 +485,79 @@ p
 ggsave(filename = "paver_best_clustering_network.pdf",
        plot = p,
        width = 12, height = 6)
+
+
+## MAPA ====
+load("3_data_analysis/07_example_output/openai_semantic_sim_matrix.rda")
+load("3_data_analysis/02_control_data/05_benchmarking/enriched_result.rda")
+
+enriched_res_temp <- openai_semantic_sim_matrix$enriched_pathway
+
+enriched_res_temp@enrichment_go_result@result <-
+  enriched_result@result |>
+  dplyr::filter(grepl("^GO:", ID)) |>
+  dplyr::mutate(p_adjust = 0.01)
+
+enriched_res_temp@enrichment_kegg_result@result <-
+  enriched_result@result |>
+  dplyr::filter(grepl("^hsa", ID)) |>
+  dplyr::mutate(p_adjust = 0.01)
+
+enriched_res_temp@enrichment_reactome_result@result <-
+  enriched_result@result |>
+  dplyr::filter(grepl("^R-HSA", ID)) |>
+  dplyr::mutate(p_adjust = 0.01)
+
+enriched_res_control_dt_1 <- enriched_res_temp
+save(enriched_res_control_dt_1, file = "3_data_analysis/02_control_data/05_benchmarking/enriched_res_control_dt_1.rda")
+
+bioembed_sim_res <-
+  get_bioembedsim(
+    object = enriched_res_control_dt_1,
+    api_provider = "openai",
+    text_embedding_model = "text-embedding-3-small",
+    api_key = api_key,
+    database = c("go", "kegg", "reactome"),
+    count.cutoff.go = 0,
+    count.cutoff.kegg = 0,
+    count.cutoff.reactome = 0
+  )
+
+save(bioembed_sim_res, file = "3_data_analysis/02_control_data/05_benchmarking/mapa_bioembed_sim_res.rda")
+
+bioembed_sim_res$enriched_pathway@enrichment_go_result <-
+  bioembed_sim_res$enriched_pathway@enrichment_go_result |>
+  dplyr::mutate(ONTOLOGY = "")
+
+bioembed_sim_res$enriched_pathway@enrichment_kegg_result <-
+  bioembed_sim_res$enriched_pathway@enrichment_kegg_result |>
+  dplyr::mutate(category = "") |>
+  dplyr::mutate(subcategory = "")
+
+# fm_result <- get_functional_modules(
+#   object = bioembed_sim_res,
+#   sim.cutoff = 0.55,
+#   cluster_method = "louvain"
+# )
+
+object$enriched_pathway@merged_module$functional_module_result <-
+  object$enriched_pathway@merged_module$functional_module_result |>
+  dplyr::rename(module_content_number = module_content_number.x)
+
+object$enriched_pathway@merged_module$result_with_module <-
+  object$enriched_pathway@merged_module$result_with_module |>
+  dplyr::rename(module_content_number = module_content_number.x)
+
+save(object, file = "3_data_analysis/02_control_data/05_benchmarking/mapa_fm_result.rda")
+
+# plot <-
+#   plot_similarity_network(
+#     object = object$enriched_pathway,
+#     level = "functional_module",
+#     database = c("go", "kegg", "reactome")
+#   )
+
+library(Cairo)
+CairoPDF("3_data_analysis/02_control_data/05_benchmarking/mapa_network.pdf", width = 10, height = 8)
+plot
+dev.off()
