@@ -39,7 +39,7 @@ combined_sim_df <- purrr::reduce(renamed_dfs, function(x, y) {
 
 # save(combined_sim_df, file = "combined_sim_df.rda")
 load("combined_sim_df.rda")
-
+export(combined_sim_df, file = "all_pathways_sim_res.xlsx")
 ## 2. Calculate Pearson correlations
 cor_jaccard <- cor(
   combined_sim_df$sim_embedding,

@@ -1,0 +1,5 @@
+module_annotation,node,pathway_name,pathway_class,p_value,p_adjust,mapped_id,Count,degree,module,module_content_number,Description
+Sphingolipid signaling pathway,mcf04071,Sphingolipid signaling pathway,Environmental Information Processing; Signal transduction,0.000120726391357626,0.0351313798850692,C00550/C00836/C00195,3,0,Functional_module_1,1,Sphingolipid signaling pathway
+Citrate cycle (TCA cycle),mcf00020,Citrate cycle (TCA cycle),Metabolism; Carbohydrate metabolism,0.000295737788429293,0.0375160965447946,C00122/C00311/C00026,3,0,Functional_module_2,1,Citrate cycle (TCA cycle)
+Arginine biosynthesis,mcf00220;mcf00430,Arginine biosynthesis,Metabolism; Amino acid metabolism,0.000515685175873466,0.0375160965447946,C00624/C00122/C00026/C00245/C01959,5,1,Functional_module_3,2,Arginine biosynthesis;Taurine and hypotaurine metabolism
+Glucagon signaling pathway,mcf04922,Glucagon signaling pathway,Organismal Systems; Endocrine system,0.00065649992282906,0.0382082955086513,C00122/C00311/C00026,3,0,Functional_module_4,1,Glucagon signaling pathway

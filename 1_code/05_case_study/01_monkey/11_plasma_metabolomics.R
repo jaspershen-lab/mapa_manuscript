@@ -39,11 +39,18 @@ embedsim_res <-
 
 save(embedsim_res, file = "met_dys_embedsim_res.rda")
 
+load("met_dys_embedsim_res.rda")
+
 functional_module_res <- get_functional_modules(
   object = embedsim_res,
   sim.cutoff = 0.55,
   cluster_method = "louvain"
 )
+
+save(functional_module_res, file = "functional_module_res_u_and_d_met.rda")
+
+functional_module <- functional_module_res@merged_module$functional_module_result
+export(functional_module, file = "met_u_and_d_functional_module_result.csv")
 
 plot <- plot_similarity_network(
   object = functional_module_res,

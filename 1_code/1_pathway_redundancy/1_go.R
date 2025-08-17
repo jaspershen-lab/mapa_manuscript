@@ -232,6 +232,7 @@ plot <-
   theme_void() +
   # labs(title = "GO Term Similarity Network (BP)", subtitle = "Edges represent high semantic similarity") +
   scale_edge_width(range = c(0.1, 2))
+plot
 ggsave(plot,
        filename = "sem_matrix_bp_network.pdf",
        width = 10,
@@ -241,7 +242,7 @@ ggsave(plot,
 library(igraph)
 
 tidygraph_obj_ig <- as.igraph(tidygraph_obj)
-modules <- cluster_edge_betweenness(tidygraph_obj_ig, weights = E(tidygraph_obj_ig)$similarity)
+modules <- cluster_edge_betweenness(tidygraph_obj_ig, weights = 1 - E(tidygraph_obj_ig)$similarity)
 
 modules
 
@@ -276,8 +277,6 @@ ggsave(plot2,
        filename = "sem_matrix_bp_network2.pdf",
        width = 10,
        height = 15)
-
-
 
 plot3 <-
   ggraph(tidygraph_obj, layout = "stress") +
@@ -329,3 +328,17 @@ ggsave(plot_module1,
        filename = "sem_matrix_bp_network_module1.pdf",
        width = 5,
        height = 5)
+
+
+## Extract module info
+library(GO.db)
+
+# GOTERM[[node_data$GO_term[1]]]@Term
+node_data_with_term_name <-
+  node_data |> dplyr::mutate(term_name = Term(GO_term))
+
+node_data_with_term_name <- node_data_with_term_name |> dplyr::arrange(module)
+node_data_with_term_name <- node_data_with_term_name |> dplyr::select(module, GO_term, term_name)
+
+save(node_data_with_term_name, file = "node_data_with_term_name.rda")
+rio::export(node_data_with_term_name, file = "go_module_info.xlsx")

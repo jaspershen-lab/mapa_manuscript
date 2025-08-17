@@ -100,6 +100,10 @@ llm_interpreted_fm_res <-
 
 save(llm_interpreted_fm_res, file = "02_proteomics_down_llm_interpreted_fm_res.rda")
 
+load("02_proteomics_down_llm_interpreted_fm_res.rda")
+functional_module <- llm_interpreted_fm_res@merged_module$functional_module_result
+export(functional_module, file = "proteomics_down_functional_module_result.csv")
+
 ## Step5: Result visualization ====
 plot <- plot_similarity_network(
   object = functional_module_res,

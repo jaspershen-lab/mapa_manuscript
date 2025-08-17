@@ -1,7 +1,7 @@
 library(r4projects)
 setwd(get_project_wd())
 rm(list = ls())
-# source('1_code/100_tools.R')
+source('1_code/100_tools.R')
 library(patchwork)
 library(ggplot2)
 
@@ -510,6 +510,8 @@ enriched_res_temp@enrichment_reactome_result@result <-
 
 enriched_res_control_dt_1 <- enriched_res_temp
 save(enriched_res_control_dt_1, file = "3_data_analysis/02_control_data/05_benchmarking/enriched_res_control_dt_1.rda")
+
+load("3_data_analysis/02_control_data/05_benchmarking/enriched_res_control_dt_1.rda")
 
 bioembed_sim_res <-
   get_bioembedsim(

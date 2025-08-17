@@ -71,6 +71,9 @@ go_combined_sim_df <- purrr::reduce(renamed_dfs, function(x, y) {
 
 save(go_combined_sim_df, file = "go_combined_sim_df.rda")
 
+load("go_combined_sim_df.rda")
+rio::export(go_combined_sim_df, file = "go_term_sim_res.xlsx")
+
 ###remove NA values
 go_combined_sim_df <- go_combined_sim_df %>%
   dplyr::filter(

@@ -98,6 +98,9 @@ llm_interpreted_fm_res <-
 
 save(llm_interpreted_fm_res, file = "02_proteomics_up_llm_interpreted_fm_res.rda")
 
+load("02_proteomics_up_llm_interpreted_fm_res.rda")
+functional_module <- llm_interpreted_fm_res@merged_module$functional_module_result
+export(functional_module, file = "proteomics_up_functional_module_result.csv")
 ## Step5: Result visualization ====
 # load("2_data/case_study/01_monkey/05_llm_interpreted_result/02_proteomics_up_llm_interpreted_fm_res.rda")
 # setwd("3_data_analysis/05_case_study/01_monkey/")

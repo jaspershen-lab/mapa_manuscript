@@ -401,3 +401,29 @@ combined_similarity_results <- tool_data %>%
   )
 
 save(combined_similarity_results, file = "comparison_result/combined_similarity_results.rda")
+
+tool_names <- c("mapa_cluster_label", "apear_cluster_label", "enrich_plot_cluster_label", "paver_cluster_label")
+
+annotation_result <-
+  filtered_all_result_long_data |>
+  dplyr::filter(method %in% tool_names) |>
+  dplyr::select(cluster, method, combined_label) |>
+  dplyr::rename(annotation = combined_label,
+                functional_module = cluster) |>
+  dplyr::mutate(method = sub("_cluster_label", "", method)) |>
+  dplyr::arrange(functional_module)
+
+sim_hm_vs_tools <-
+  combined_similarity_results |>
+  dplyr::select(tool_cluster, tool_name, expert_name, cosine_sim) |>
+  dplyr::rename(functional_module = tool_cluster) |>
+  dplyr::mutate(method = sub("_cluster_label", "", tool_name)) |>
+  dplyr::select(-tool_name) |>
+  left_join(hm_name_id, by = "expert_name")
+
+sim_hm_vs_tools <- sim_hm_vs_tools |> dplyr::select(functional_module, expert_id, method, cosine_sim)
+
+library(rio)
+export(all_clustering_res, file = "clustering_result.xlsx")
+export(annotation_result, file = "annotation_result.xlsx")
+export(sim_hm_vs_tools, file = "similarity_hm_tool.xlsx")
