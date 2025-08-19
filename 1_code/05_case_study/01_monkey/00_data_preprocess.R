@@ -167,7 +167,7 @@ save(brain_down_dt_converted, file = "04_sn_rnaseq/brain_down_dt_converted.rda")
 
 # 04_sn_rna_seq_liver ====
 liver_rna_seq_dt <- import(
-  "2_data/case_study/01_monkey/04_sn_rnaseq/mmc4.xlsx",
+  "2_data/case_study/01_monkey/mmc4.xlsx",
   skip = 1,
   header = TRUE,
   sheet = 2
