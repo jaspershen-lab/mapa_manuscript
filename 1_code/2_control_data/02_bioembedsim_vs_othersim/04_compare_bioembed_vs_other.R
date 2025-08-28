@@ -8,14 +8,14 @@ library(reshape2)
 control_dt <- readxl::read_excel("2_data/control_data.xlsx", sheet = 1)
 
 load(
-  "3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/embedding_sim_df.rda"
+  "3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/biotext_embedding/embedding_sim_df.rda"
 )
 load(
-  "3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/jaccard_sim_df.rda"
+  "3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/overlap_similarity/jaccard_sim_df.rda"
 )
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/kappa_sim_df.rda")
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/op_sim_df.rda")
-load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/dice_sim_df.rda")
+load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/overlap_similarity/kappa_sim_df.rda")
+load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/overlap_similarity/op_sim_df.rda")
+load("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim/overlap_similarity/dice_sim_df.rda")
 
 setwd("3_data_analysis/02_control_data/02_bioembedsim_vs_othersim")
 
@@ -326,7 +326,7 @@ ggsave(
 )
 
 
-####add median values for each group
+####add median values for each groups
 plot <-
   temp_data %>%
   ggplot(aes(x = class, y = sim_op)) +
@@ -353,11 +353,12 @@ plot <-
     alpha = 0.5,
     show.legend = FALSE
   ) +
-  scale_y_continuous(limits = c(0, 1)) +
+  scale_y_continuous(limits = c(0, 1.01),
+                     breaks = seq(0, 1.01, 0.25)) +
   theme_bw() +
   scale_fill_manual(values = same_different_module_color) +
-  scale_color_manual(values = same_different_module_color) +
-  labs(x = "", y = "Overlap cofficient") +
+  # scale_color_manual(values = same_different_module_color) +
+  labs(x = "", y = "Overlap coefficient") +
   stat_summary(
     fun = median,
     geom = "text",
