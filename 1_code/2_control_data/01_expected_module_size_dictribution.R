@@ -36,9 +36,11 @@ plot <-
   ggplot() +
   geom_bar(aes(expected_module, fill = database),
            color = "black") +
+  coord_flip() +
   theme_bw() +
   theme(
-    legend.position = c(0.05, 0.95),
+    # legend.position = c(0.05, 0.95),
+    legend.position = c(0.7, 0.35),
     legend.justification = c(0, 1)
   ) +
   xlab("") +
@@ -52,3 +54,9 @@ ggsave(plot = plot,
        height = 5,
        width = 8
        )
+
+ggsave(plot = plot,
+       filename = "expected_module_size_dictribution_portrait.pdf",
+       height = 4.2,
+       width = 4
+)
