@@ -204,6 +204,23 @@ up_rna_enriched_pathways
 
 save(up_rna_enriched_pathways, file = "taxid_9606/spleen/up/up_rna_enriched_pathways.rda")
 
+# ### add reactome
+# up_rna_enriched_pathways <-
+#   enrich_pathway(
+#     variable_info = up_rna_variable_info,
+#     query_type = "gene",
+#     database = c("go", "kegg", "reactome"),
+#     go.orgdb = org.Hs.eg.db,
+#     go.keytype = "SYMBOL",
+#     go.ont = "ALL",
+#     kegg.organism = "hsa",
+#     kegg.keytype = "kegg",
+#     pvalueCutoff = 0.05,
+#     pAdjustMethod = "BH"
+#   )
+# up_rna_enriched_pathways
+
+
 # protein
 prot_raw_dt <- read_xlsx("raw_data/spleen/spleen_age_related_protein.xlsx")
 summary(prot_raw_dt)

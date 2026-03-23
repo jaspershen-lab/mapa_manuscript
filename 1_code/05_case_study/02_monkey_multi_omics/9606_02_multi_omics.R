@@ -11,6 +11,8 @@ load("taxid_9606/thymus/met_enriched_pathways.rda")
 load("taxid_9606/thymus/up/up_rna_enriched_pathways.rda")
 load("taxid_9606/thymus/up/up_prot_enriched_pathways.rda")
 
+met_enriched_pathways@variable_info <- met_enriched_pathways@variable_info |> dplyr::rename(diff_metric = beta)
+
 network_tables <- build_network_tables(transcriptome_enrich = up_rna_enriched_pathways,
                                        proteome_enrich = up_prot_enriched_pathways,
                                        metabolome_enrich = met_enriched_pathways,
@@ -34,21 +36,20 @@ save(mnet_sim, file = "taxid_9606/thymus/up/mnet_sim.rda")
 
 multi_omics_fm <- get_functional_modules(object = mnet_obj,
                                          sim_matrix = mnet_sim,
-                                         sim_cutoff = 0.55,
+                                         sim_cutoff = 0.45,
                                          cluster_method = "louvain")
 save(multi_omics_fm, file = "taxid_9606/thymus/up/multi_omics_fm.rda")
 
 plot_module_info(multi_omics_fm,
-                 module_id = "Functional_module_16")
-
-plot_module_info(multi_omics_fm,
-                 module_id = "Functional_module_68")
-
+                 module_id = "Functional_module_46",
+                 show_rwr_edge = TRUE)
 
 # Thymus (down) ====
 load("taxid_9606/thymus/down/down_rna_enriched_pathways.rda")
 load("taxid_9606/thymus/down/down_prot_enriched_pathways.rda")
 load("taxid_9606/thymus/met_enriched_pathways.rda")
+
+met_enriched_pathways@variable_info <- met_enriched_pathways@variable_info |> dplyr::rename(diff_metric = beta)
 
 network_tables <- build_network_tables(transcriptome_enrich = down_rna_enriched_pathways,
                                        proteome_enrich = down_prot_enriched_pathways,
@@ -78,13 +79,16 @@ multi_omics_fm <- get_functional_modules(object = mnet_obj,
 save(multi_omics_fm, file = "taxid_9606/thymus/down/multi_omics_fm.rda")
 
 plot_module_info(multi_omics_fm,
-                 module_id = "Functional_module_65",
-                 node_size = 5)
+                 module_id = "Functional_module_5",
+                 node_size = 5,
+                 show_rwr_edge = TRUE)
 
 # Spleen ====
 load("taxid_9606/spleen/met_enriched_pathways.rda")
 load("taxid_9606/spleen/up/up_rna_enriched_pathways.rda")
 load("taxid_9606/spleen/up/up_prot_enriched_pathways.rda")
+
+met_enriched_pathways@variable_info <- met_enriched_pathways@variable_info |> dplyr::rename(diff_metric = beta)
 
 network_tables <- build_network_tables(transcriptome_enrich = up_rna_enriched_pathways,
                                        proteome_enrich = up_prot_enriched_pathways,
@@ -314,6 +318,8 @@ load("taxid_9606/kidney/met_enriched_pathways.rda")
 load("taxid_9606/kidney/up/up_rna_enriched_pathways.rda")
 load("taxid_9606/kidney/up/up_prot_enriched_pathways.rda")
 
+met_enriched_pathways@variable_info <- met_enriched_pathways@variable_info |> dplyr::rename(diff_metric = beta)
+
 network_tables <- build_network_tables(transcriptome_enrich = up_rna_enriched_pathways,
                                        proteome_enrich = up_prot_enriched_pathways,
                                        metabolome_enrich = met_enriched_pathways,
@@ -331,12 +337,12 @@ mnet_obj <- build_MNetwork(network_tables = network_tables,
 save(mnet_obj, file = "taxid_9606/kidney/up/mnet_obj.rda")
 
 mnet_sim <- get_multi_omics_sim(mnet_obj = mnet_obj,
-                                r = 0.7, lambda = 0.6, delta1 = 0.5)
+                                r = 0.7, lambda = 0.5, delta1 = 0.3)
 save(mnet_sim, file = "taxid_9606/kidney/up/mnet_sim.rda")
 
 multi_omics_fm <- get_functional_modules(object = mnet_obj,
                                          sim_matrix = mnet_sim,
-                                         sim_cutoff = 0.55,
+                                         sim_cutoff = 0.5,
                                          cluster_method = "louvain")
 
 save(multi_omics_fm, file = "taxid_9606/kidney/up/multi_omics_fm.rda")
@@ -352,6 +358,8 @@ setwd("2_data/case_study/02_monkey_multi_omics/")
 load("taxid_9606/kidney/met_enriched_pathways.rda")
 load("taxid_9606/kidney/down/down_rna_enriched_pathways.rda")
 load("taxid_9606/kidney/down/down_prot_enriched_pathways.rda")
+
+met_enriched_pathways@variable_info <- met_enriched_pathways@variable_info |> dplyr::rename(diff_metric = beta)
 
 network_tables <- build_network_tables(transcriptome_enrich = down_rna_enriched_pathways,
                                        proteome_enrich = down_prot_enriched_pathways,
@@ -370,12 +378,12 @@ mnet_obj <- build_MNetwork(network_tables = network_tables,
 save(mnet_obj, file = "taxid_9606/kidney/down/mnet_obj.rda")
 
 mnet_sim <- get_multi_omics_sim(mnet_obj = mnet_obj,
-                                r = 0.7, lambda = 0.6, delta1 = 0.5)
+                                r = 0.5, lambda = 0.5, delta1 = 0.5)
 save(mnet_sim, file = "taxid_9606/kidney/down/mnet_sim.rda")
 
 multi_omics_fm <- get_functional_modules(object = mnet_obj,
                                          sim_matrix = mnet_sim,
-                                         sim_cutoff = 0.55,
+                                         sim_cutoff = 0.45,
                                          cluster_method = "louvain")
 
 save(multi_omics_fm, file = "taxid_9606/kidney/down/multi_omics_fm.rda")
@@ -391,6 +399,8 @@ setwd("2_data/case_study/02_monkey_multi_omics/")
 load("taxid_9606/aortic_arch/met_enriched_pathways.rda")
 load("taxid_9606/aortic_arch/up/up_rna_enriched_pathways.rda")
 load("taxid_9606/aortic_arch/up/up_prot_enriched_pathways.rda")
+
+met_enriched_pathways@variable_info <- met_enriched_pathways@variable_info |> dplyr::rename(diff_metric = beta)
 
 network_tables <- build_network_tables(transcriptome_enrich = up_rna_enriched_pathways,
                                        proteome_enrich = up_prot_enriched_pathways,
@@ -470,6 +480,8 @@ load("taxid_9606/thyroid/met_enriched_pathways.rda")
 load("taxid_9606/thyroid/up/up_rna_enriched_pathways.rda")
 load("taxid_9606/thyroid/up/up_prot_enriched_pathways.rda")
 
+met_enriched_pathways@variable_info <- met_enriched_pathways@variable_info |> dplyr::rename(diff_metric = beta)
+
 network_tables <- build_network_tables(transcriptome_enrich = up_rna_enriched_pathways,
                                        proteome_enrich = up_prot_enriched_pathways,
                                        metabolome_enrich = met_enriched_pathways,
@@ -498,8 +510,8 @@ multi_omics_fm <- get_functional_modules(object = mnet_obj,
 save(multi_omics_fm, file = "taxid_9606/thyroid/up/multi_omics_fm.rda")
 
 plot_module_info(multi_omics_fm,
+                 show_rwr_edge = TRUE,
                  module_id = "Functional_module_24")
-
 
 # Thyroid (down) ====
 setwd(r4projects::get_project_wd())
