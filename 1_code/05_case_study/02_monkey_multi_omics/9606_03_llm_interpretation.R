@@ -44,8 +44,8 @@ save(llm_interpreted_object, file = "taxid_9606/thymus/up/llm_interpreted_object
 # Thymus (down) ====
 load("taxid_9606/thymus/down/multi_omics_fm.rda")
 
-multi_omics_fm$functional_module_result <- multi_omics_fm$functional_module_result |>
-  dplyr::filter(multi_omics_num == 3 & module %in% c("Functional_module_5", "Functional_module_2", "Functional_module_66"))
+# multi_omics_fm$functional_module_result <- multi_omics_fm$functional_module_result |>
+#   dplyr::filter(multi_omics_num == 3 & module %in% c("Functional_module_5", "Functional_module_2", "Functional_module_66"))
 
 # multi_omics_fm$functional_module_result <- multi_omics_fm$functional_module_result |>
 #   dplyr::filter(multi_omics_num == 3 & module == "Functional_module_5")
@@ -53,6 +53,8 @@ multi_omics_fm$functional_module_result <- multi_omics_fm$functional_module_resu
 # plot_module_info(multi_omics_fm,
 #                  module_id = "Functional_module_66",
 #                  show_rwr_edge = TRUE)
+
+multi_omics_fm$functional_module_result <- multi_omics_fm$functional_module_result |> filter(multi_omics_num == 3)
 
 llm_interpreted_object <- llm_interpret_module(object = multi_omics_fm,
                                                module_content_number_cutoff = 3,
@@ -563,7 +565,9 @@ plot
 dev.off()
 
 # thyroid up fm_24
-set.seed(5)
+load("thyroid/up/llm_interpreted_object.rda")
+
+set.seed(7)
 
 plot <-
   plot_module_info(object = llm_interpreted_object,
