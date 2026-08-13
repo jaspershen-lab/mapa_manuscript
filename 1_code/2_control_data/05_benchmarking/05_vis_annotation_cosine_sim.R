@@ -41,16 +41,12 @@ combined_similarity_results_ordered <- combined_similarity_results |>
 
 combined_similarity_results_ordered_remove_jc_5 <-
   combined_similarity_results_ordered |>
-  filter(!(expert_name == "JiangChao" & expert_cluster == 5))
+  filter(!(expert_id == "Expert #1" & expert_cluster == 5))
 
 library(ggsignif)
 
-cluster_labeller <- function(variable, value) {
-  return(paste("Functional Module", value))
-}
-
-combined_p <- ggplot(combined_similarity_results_ordered_remove_jc_5, aes(x = tool_name, y = cosine_sim, fill = tool_name)) +
-  geom_boxplot(alpha = 0.7) +
+combined_p <- ggplot(combined_similarity_results_ordered, aes(x = tool_name, y = cosine_sim, fill = tool_name)) +
+  geom_boxplot(alpha = 0.7, outlier.shape = NA) +
   geom_point(aes(fill = tool_name),
              position = position_jitter(width = 0.2),
              size = 1,
@@ -70,7 +66,14 @@ combined_p <- ggplot(combined_similarity_results_ordered_remove_jc_5, aes(x = to
     size = 0.5,
     textsize = 2.5
   ) +
-  facet_wrap(~ tool_cluster, labeller = cluster_labeller, scales = "free_x", nrow = 2) +
+  facet_wrap(
+  ~ tool_cluster,
+  labeller = labeller(
+    tool_cluster = \(x) paste("Functional Module", x)
+  ),
+  scales = "free_x",
+  nrow = 2
+  ) +
   labs(
     x = NULL,  # Remove x-axis title
     y = "Cosine Similarity",
@@ -95,8 +98,8 @@ combined_p <- ggplot(combined_similarity_results_ordered_remove_jc_5, aes(x = to
   guides(fill = guide_legend(nrow = 1))
 
 combined_p
-ggsave(plot = combined_p, filename = "remove_na_fm_5_jc_combined_p.pdf", height = 6, width = 8)
+
+ggsave(plot = combined_p, filename = "fm_5_jc_combined_p_2.pdf", height = 6, width = 8)
 
 fm5 <- combined_similarity_results_ordered_remove_jc_5 |>
   filter(tool_cluster == 5)
-

@@ -1,0 +1,3 @@
+"llm","n_pairs","real_mean","real_sd","random_mean","random_sd","mean_paired_difference","paired_t_p_value","paired_wilcox_p_value","paired_wilcox_significance","wilcoxon_rank_sum_p_value","rank_sum_significance"
+"GPT-4o-mini",8,0.91625,0.0106066017177982,0.88625,0.0311390888939105,0.03,0.0230425446690322,0.0350149810196625,"*",0.0292451382878787,"*"
+"Qwen3.6-35B-A3B",8,0.9575,0.0175254916376933,0.84375,0.11375883011253,0.11375,0.0222339974089187,0.0141474038860215,"*",0.00100297178064261,"**"

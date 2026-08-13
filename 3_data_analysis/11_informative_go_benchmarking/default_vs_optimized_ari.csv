@@ -1,0 +1,5 @@
+methods,default_ari,default_params,default_n_clusters,optimized_ari,optimized_params,optimized_n_clusters
+MAPA,0.1719321135228537,"sim.cutoff=0.55, louvain",42,0.5656266979689193,"kmeans, centers=77",77
+enrichplot,-0.0011906841826880515,"nCluster=floor(sqrt(n))=17, kmeans",17,0.053297182083676974,"nCluster=73, kmeans",73
+aPEAR,0.017873145598737896,"jaccard, markov",299,0.1061737626555712,"jaccard, hier",239
+PAVER,0.15386220137684858,"ward.D2, cutreeDynamic defaults",8,0.4759931693040211,maxCoreScatter=0.88,58

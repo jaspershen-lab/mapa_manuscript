@@ -1,0 +1,29 @@
+Embedding and clustering: COMPLETE
+  Model: Qwen/Qwen3-Embedding-8B
+  MAPA defaults: Louvain, cosine-similarity cutoff 0.55
+  Qwen ARI versus ground truth: 0.811017
+  Original ARI versus ground truth: 0.949894
+  Qwen versus original clustering ARI: 0.852717
+  Pairwise similarity Pearson r: 0.821327
+  Pairwise similarity Spearman rho: 0.603267
+
+Module annotation: COMPLETE
+  Model: Qwen/Qwen3.6-35B-A3B
+  Modules: 16 (8 real + 8 size-matched random)
+  Qwen vs GPT semantic cosine similarity:
+    Overall median 0.840 (IQR 0.806-0.874), n=16
+    Real median 0.868 (IQR 0.856-0.885), n=8
+    Random median 0.798 (IQR 0.755-0.829), n=8
+  Qwen vs experts (including 'Not Available'):
+    Median 0.753 (IQR 0.701-0.783), n=40
+    GPT median 0.724 (IQR 0.682-0.772), n=40
+    Overall paired Qwen-vs-GPT Wilcoxon p=0.0431
+    Per-module paired Wilcoxon tests include all 5 expert pairs; all are ns
+  Qwen confidence score:
+    Real mean 0.958 (SD 0.018)
+    Random mean 0.844 (SD 0.114)
+    Mean paired difference 0.114
+    Paired t-test p=0.0222
+    Paired Wilcoxon signed-rank p=0.0141 (*)
+  The runner reuses the exact GPT prompts and retrieval inputs and caches each
+  completed module independently.

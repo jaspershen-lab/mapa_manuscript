@@ -102,7 +102,7 @@ formated_result <- left_join(formated_result, module_content_counts, by = "expec
 colnames(formated_result)[1:3] = c("module","pathway_id","Description")
 
 #加上一列$module_content_number
-openai_key = "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"
+
 enriched_functional_module@merged_module[["functional_module_result"]] = formated_result
 # processed_module = llm_interpret_module(enriched_functional_module, api_key=openai_key,embedding_output_dir = "./embeddings")
 object <- enriched_functional_module

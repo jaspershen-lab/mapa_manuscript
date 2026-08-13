@@ -538,9 +538,12 @@ mnet_obj <- build_MNetwork(network_tables = network_tables,
                            api_key = api_key)
 save(mnet_obj, file = "taxid_9606/thyroid/down/mnet_obj.rda")
 
+load("2_data/case_study/02_monkey_multi_omics/taxid_9606/thyroid/down/mnet_obj.rda")
+setwd("2_data/case_study/02_monkey_multi_omics/")
 mnet_sim <- get_multi_omics_sim(mnet_obj = mnet_obj,
-                                r = 0.7, lambda = 0.6, delta1 = 0.5)
+                                r = 0.7, lambda = 0.6, delta1 = 0.5, min_path_sim = 0)
 save(mnet_sim, file = "taxid_9606/thyroid/down/mnet_sim.rda")
+mnet_sim@x |> hist()
 
 multi_omics_fm <- get_functional_modules(object = mnet_obj,
                                          sim_matrix = mnet_sim,

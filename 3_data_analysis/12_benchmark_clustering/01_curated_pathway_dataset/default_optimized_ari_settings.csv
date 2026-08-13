@@ -1,0 +1,7 @@
+method,default_ari,default_n_clusters,default_native_n_clusters,default_n_unassigned,default_settings,optimized_ari,optimized_n_clusters,optimized_native_n_clusters,optimized_n_unassigned,optimized_settings,default_status
+MAPA,0.9498940677966101,14,14,0,sim.cutoff=0.55; cluster_method=louvain,0.9498940677966101,14,14,0,sim.cutoff=0.55; cluster_method=louvain (existing result),ok
+PAVER,0.025794756406367927,9,1,8,hclust_method=ward.D2; cutreeDynamic defaults; minClusterSize=20; unassigned_as_singletons,0.6711952876324744,9,9,0,hclust_method=complete; minClusterSize=2; maxCoreScatter=0.58; minGap=0.3150,"public generate_themes error: ℹ In index: 2.
+Caused by error:
+! Result must be length 1, not 0."
+aPEAR,0.2714780069209689,34,6,28,simMethod=jaccard; clustMethod=markov; minClusterSize=2; excluded_as_singletons,0.4943269993447598,24,9,15,simMethod=cosine; clustMethod=markov; minClusterSize=2; excluded_as_singletons,ok
+enrichplot,0.24247277386290841,6,6,0,layout=kk; nCluster=floor(sqrt(n))=6; min_edge=0.2; clusterFunction=kmeans,0.5141899562138493,10,10,0,layout=fr; nCluster=10; min_edge=0.1; clusterFunction=kmeans,ok

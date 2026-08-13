@@ -1,0 +1,11 @@
+Qwen embedding model: Qwen/Qwen3-Embedding-8B
+MAPA default clustering: louvain, similarity cutoff 0.55
+Pathways: 44
+Qwen ARI versus ground truth: 0.811017
+Original ARI versus ground truth: 0.949894
+Qwen versus original clustering ARI: 0.852717
+Pairwise cosine-similarity Pearson r: 0.821327
+Pairwise cosine-similarity Spearman rho: 0.603267
+Qwen clusters/edges: 12/66
+Original clusters/edges: 14/57
+Qwen embedding source: reused_verified_cache:3_data_analysis/09_select_model_param/siliconflow_embedding_matrix.rda

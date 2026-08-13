@@ -393,7 +393,7 @@ filtered_sim_matrix <- sim_matrix
 save(filtered_sim_matrix, file = "filtered_sim_matrix.rda")
 
 # Step4: Cluster functional module ====
-load("01_transcriptomics/filtered_sim_matrix.rda")
+load("filtered_sim_matrix.rda")
 merge_by_hierarchical <- function(sim_matrix,
                                   hclust.method,
                                   sim.cutoff) {

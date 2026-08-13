@@ -1,0 +1,45 @@
+"pathway_id","pathway_name","database","ground_truth","qwen_default_louvain","original_default_louvain"
+"hsa03082","ATP-dependent chromatin remodeling","KEGG","Functional_module_1",1,1
+"hsa04210","Apoptosis","KEGG","Functional_module_10",2,2
+"GO:0000165","MAPK cascade","GO","Functional_module_10",3,3
+"GO:0004672","protein kinase activity","GO","Functional_module_10",3,3
+"GO:0004674","protein serine/threonine kinase activity","GO","Functional_module_10",3,3
+"GO:0004707","MAP kinase activity","GO","Functional_module_10",3,3
+"GO:0070371","ERK1 and ERK2 cascade","GO","Functional_module_10",3,3
+"hsa04010","MAPK signaling pathway","KEGG","Functional_module_10",3,3
+"R-HSA-397014","Muscle contraction","Reactome","Functional_module_2",4,4
+"hsa03018","RNA degradation","KEGG","Functional_module_3",5,5
+"GO:0098978","glutamatergic synapse","GO","Functional_module_4",6,6
+"GO:0098985","asymmetric, glutamatergic, excitatory synapse","GO","Functional_module_4",6,6
+"hsa04724","Glutamatergic synapse","KEGG","Functional_module_4",6,6
+"hsa03030","DNA replication","KEGG","Functional_module_5",7,7
+"R-HSA-68952","DNA replication initiation","Reactome","Functional_module_5",7,7
+"R-HSA-69306","DNA Replication","Reactome","Functional_module_5",7,7
+"GO:0044183","protein folding chaperone","GO","Functional_module_6",8,8
+"GO:0009055","electron transfer activity","GO","Functional_module_7",9,9
+"GO:0045251","electron transfer flavoprotein complex","GO","Functional_module_7",9,9
+"hsa00190","Oxidative phosphorylation","KEGG","Functional_module_7",1,10
+"GO:0002250","adaptive immune response","GO","Functional_module_8",10,11
+"GO:0006955","immune response","GO","Functional_module_8",10,11
+"hsa04660","T cell receptor signaling pathway","KEGG","Functional_module_8",10,11
+"hsa04662","B cell receptor signaling pathway","KEGG","Functional_module_8",10,11
+"R-HSA-1280218","Adaptive Immune System","Reactome","Functional_module_8",10,11
+"R-HSA-388841","Regulation of T cell activation by CD28 family","Reactome","Functional_module_8",10,11
+"R-HSA-983705","Signaling by the B Cell Receptor (BCR)","Reactome","Functional_module_8",10,11
+"hsa00061","Fatty acid biosynthesis","KEGG","Functional_module_9",1,12
+"GO:0006633","fatty acid biosynthetic process","GO","Functional_module_9",1,12
+"GO:0042761","very long-chain fatty acid biosynthetic process","GO","Functional_module_9",1,12
+"GO:0051790","short-chain fatty acid biosynthetic process","GO","Functional_module_9",1,12
+"hsa00020","Citrate cycle (TCA cycle)","KEGG","Functional_module_9",11,12
+"hsa00062","Fatty acid elongation","KEGG","Functional_module_9",1,12
+"R-HSA-75105","Fatty acyl-CoA biosynthesis","Reactome","Functional_module_9",1,12
+"GO:0051147","regulation of muscle cell differentiation","GO","Functional_module_11",12,13
+"GO:0051146","striated muscle cell differentiation","GO","Functional_module_11",12,13
+"GO:0051148","negative regulation of muscle cell differentiation","GO","Functional_module_11",12,13
+"GO:0051153","regulation of striated muscle cell differentiation","GO","Functional_module_11",12,13
+"GO:0051154","negative regulation of striated muscle cell differentiation","GO","Functional_module_11",12,13
+"R-HSA-8852135","Protein ubiquitination","Reactome","Functional_module_12",5,14
+"hsa04120","Ubiquitin mediated proteolysis","KEGG","Functional_module_12",5,14
+"hsa03050","Proteasome","KEGG","Functional_module_12",5,14
+"GO:0016567","protein ubiquitination","GO","Functional_module_12",5,14
+"GO:0061630","ubiquitin protein ligase activity","GO","Functional_module_12",5,14

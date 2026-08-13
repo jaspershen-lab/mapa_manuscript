@@ -179,6 +179,8 @@ up_rna <- rna_raw_dt |>
   dplyr::filter(beta > 0.008 & Pvalue < 0.05) |>
   dplyr::rename(symbol = ID)
 
+rio::export(up_rna, file = "taxid_9606/spleen/up/demo_up_T_list.xlsx")
+
 up_rna_variable_info <- convert_id(
   data = up_rna,
   query_type = "gene",
@@ -228,6 +230,8 @@ up_prot <- prot_raw_dt |>
   dplyr::filter(beta > 0.008 & Pvalue < 0.05) |>
   dplyr::rename(symbol = ID)
 
+rio::export(up_prot, file = "taxid_9606/spleen/up/demo_up_P_list.xlsx")
+
 up_prot_variable_info <- convert_id(
   data = up_prot,
   query_type = "gene",
@@ -267,6 +271,8 @@ met_raw_dt |>
   dplyr::select(keggid, cpd_name, everything()) |>
   dplyr::distinct(keggid, .keep_all = TRUE) |>
   dplyr::filter(keggid != "") -> met_dt
+
+rio::export(met_dt, file = "taxid_9606/spleen/demo_M_list.xlsx")
 
 met_enriched_pathways <-
   enrich_pathway(

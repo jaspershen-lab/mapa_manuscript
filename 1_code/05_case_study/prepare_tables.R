@@ -136,9 +136,15 @@ mapped <- string_db$map(P_deg_symbol, "symbol", removeUnmappedRows = TRUE)
 # Interactions *among* the proteins in your list :contentReference[oaicite:3]{index=3}
 ppi <- string_db$get_interactions(mapped$STRING_id)
 
+# https://stringdb-downloads.org/download/protein.links.v12.0/9606.protein.links.v12.0.txt.gz
+# https://stringdb-downloads.org/download/protein.info.v12.0/9606.protein.info.v12.0.txt.gz
+# https://stringdb-downloads.org/download/protein.aliases.v12.0/9606.protein.aliases.v12.0.txt.gz
+
 ## Step 4.3: Get Protein-Metabolite edges ====
 ### From Reactome database ====
 chebl2rn_url <- "https://download.reactome.org/95/ChEBI2Reactome_PE_Reactions.txt"
+
+# https://download.reactome.org/96/ChEBI2Reactome_PE_Reactions.txt
 # dir.create("2_data/case_study/01_monkey/reactome_db")
 dest <- file.path("2_data/case_study/01_monkey/reactome_db", "ChEBI2Reactome_PE_Reactions.txt")
 system2("curl", c("-L", "--retry", "3", "--fail", "-o", shQuote(dest), shQuote(chebl2rn_url)))
@@ -147,11 +153,13 @@ uniprot2rn_url <- "https://download.reactome.org/95/UniProt2Reactome_PE_Reaction
 # dir.create("2_data/case_study/01_monkey/reactome_db")
 dest <- file.path("2_data/case_study/01_monkey/reactome_db", "UniProt2Reactome_PE_Reactions.txt")
 system2("curl", c("-L", "--retry", "3", "--fail", "-o", shQuote(dest), shQuote(uniprot2rn_url)))
+# https://download.reactome.org/96/UniProt2Reactome_PE_Reactions.txt
 
 prot2rn_url <- "https://download.reactome.org/95/ProteinRoleReaction.txt"
 # dir.create("2_data/case_study/01_monkey/reactome_db")
 dest <- file.path("2_data/case_study/01_monkey/reactome_db", "ProteinRoleReaction.txt")
 system2("curl", c("-L", "--retry", "3", "--fail", "-o", shQuote(dest), shQuote(prot2rn_url)))
+# https://download.reactome.org/96/ProteinRoleReaction.txt
 
 sp <- "HSA"
 rxn_pat <- paste0("^R-", sp, "-")

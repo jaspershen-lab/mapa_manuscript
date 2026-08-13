@@ -454,19 +454,17 @@ ggsave(
 )
 
 ####add median values for each group
+## geom_half_point() is incompatible with the currently installed ggplot2,
+## so draw the same left-side jittered points with geom_point().
+set.seed(123)
+temp_data_op <- temp_data %>%
+  dplyr::mutate(
+    x_jit = as.numeric(class) - 0.1 - stats::runif(dplyr::n(), 0, 0.2)
+  )
+
 plot <-
-  temp_data %>%
+  temp_data_op %>%
   ggplot(aes(x = class, y = sim_op)) +
-  geom_half_point(
-    aes(fill = class),
-    side = "l",
-    position = position_nudge(x = -0.1),
-    color = "black",
-    size = 4,
-    shape = 21,
-    alpha = 0.7,
-    show.legend = FALSE
-  ) +
   geom_half_boxplot(
     outlier.shape = NA,
     side = "l",
@@ -480,7 +478,24 @@ plot <-
     alpha = 0.5,
     show.legend = FALSE
   ) +
-  scale_y_continuous(limits = c(0, 1)) +
+  ## Add numeric jitter positions after the discrete-x layers so ggplot2
+  ## retains a discrete x scale.
+  geom_point(
+    data = temp_data_op,
+    aes(x = x_jit, y = sim_op, fill = class),
+    inherit.aes = FALSE,
+    color = "black",
+    size = 4,
+    shape = 21,
+    alpha = 0.7,
+    show.legend = FALSE
+  ) +
+  ## Leave headroom above the maximum overlap coefficient (1.0), otherwise
+  ## geom_signif's bracket and label are clipped by the y-axis limit.
+  scale_y_continuous(
+    limits = c(0, 1.12),
+    breaks = seq(0, 1, 0.25)
+  ) +
   theme_bw() +
   scale_fill_manual(values = same_different_module_color) +
   scale_color_manual(values = same_different_module_color) +
@@ -498,7 +513,7 @@ plot <-
     comparisons = list(c("same_module", "different_module")),
     map_signif_level = TRUE,
     textsize = 3.5,
-    y_position = 0.95,
+    y_position = 1.05,
     vjust = 0.5
   )
 plot

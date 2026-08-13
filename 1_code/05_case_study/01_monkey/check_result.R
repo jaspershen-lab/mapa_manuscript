@@ -353,6 +353,51 @@ CairoPDF("3_data_analysis/05_case_study/01_monkey/bulk_rna_seq/figure6e_int_duod
 print(plot4)
 dev.off()
 
+## Combined figure 6b-e with shared legend ----
+library(cowplot)
+
+# Fixed limits so all 4 panels use the same data-to-visual mapping.
+# Adjust limits = c(1, 4) if your abs(NES) range differs; sim is 0-1.
+shared_scale_size <- scale_size_continuous(
+  range  = c(2, 10),
+  limits = c(0, 10),
+  breaks = c(2,4,6,8)
+)
+shared_scale_edge <- ggraph::scale_edge_width_continuous(
+  range  = c(0.1, 1),
+  limits = c(0, 1),
+  breaks = c(0.25, 0.5, 0.75, 1.0)
+)
+
+p_6b <- plot1 + shared_scale_size + shared_scale_edge + theme(legend.position = "none")
+p_6c <- plot2 + shared_scale_size + shared_scale_edge + theme(legend.position = "none")
+p_6d <- plot3 + shared_scale_size + shared_scale_edge + theme(legend.position = "none")
+p_6e <- plot4 + shared_scale_size + shared_scale_edge + theme(legend.position = "none")
+
+shared_legend <- cowplot::get_legend(
+  plot1 + shared_scale_size + shared_scale_edge + theme(legend.position = "right")
+)
+
+panels_6bcde <- cowplot::plot_grid(
+  p_6b, p_6c, p_6d, p_6e,
+  ncol       = 2,
+  labels     = c("b", "c", "d", "e"),
+  label_size = 8
+)
+
+figure_6bcde <- cowplot::plot_grid(
+  panels_6bcde, shared_legend,
+  rel_widths = c(1, 0.25),
+  nrow       = 1
+)
+
+figure_6bcde
+
+CairoPDF("3_data_analysis/05_case_study/01_monkey/bulk_rna_seq/figure6bcde_combined.pdf",
+         width = 13, height = 8)
+print(figure_6bcde)
+dev.off()
+
 ## supplementary: brain fl and duodenum ====
 brain_fl_meta_fm_ids <- names(heatmap_matrix["Brain (FL)",])[heatmap_matrix["Brain (FL)",] != 0]
 int_duodenum_meta_fm_ids <- names(heatmap_matrix["Intestine (Duodenum)",])[heatmap_matrix["Intestine (Duodenum)",] != 0]

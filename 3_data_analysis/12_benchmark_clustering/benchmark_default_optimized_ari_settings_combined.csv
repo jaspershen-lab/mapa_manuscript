@@ -1,0 +1,9 @@
+benchmark_dataset,method,default_settings,default_ari,optimized_settings,optimized_ari
+Curated pathway dataset,MAPA,sim.cutoff=0.55; cluster_method=louvain,0.9498940677966101,sim.cutoff=0.55; cluster_method=louvain (existing result),0.9498940677966101
+Curated pathway dataset,PAVER,hclust_method=ward.D2; cutreeDynamic defaults; minClusterSize=20; unassigned_as_singletons,0.025794756406367927,hclust_method=complete; minClusterSize=2; maxCoreScatter=0.58; minGap=0.3150,0.6711952876324744
+Curated pathway dataset,aPEAR,simMethod=jaccard; clustMethod=markov; minClusterSize=2; excluded_as_singletons,0.2714780069209689,simMethod=cosine; clustMethod=markov; minClusterSize=2; excluded_as_singletons,0.4943269993447598
+Curated pathway dataset,enrichplot,layout=kk; nCluster=floor(sqrt(n))=6; min_edge=0.2; clusterFunction=kmeans,0.24247277386290841,layout=fr; nCluster=10; min_edge=0.1; clusterFunction=kmeans,0.5141899562138493
+Informative GO term dataset,MAPA,"sim.cutoff=0.55, louvain",0.1719321135228537,"kmeans, centers=77 (existing result)",0.5656266979689193
+Informative GO term dataset,PAVER,hclust_method=ward.D2; cutreeDynamic defaults; minClusterSize=20; unassigned_as_singletons,0.15386220137684858,hclust_method=complete; minClusterSize=2; maxCoreScatter=0.79; minGap=0.1575,0.49463057180750786
+Informative GO term dataset,aPEAR,simMethod=jaccard; clustMethod=markov; minClusterSize=2; excluded_as_singletons,0.017873145598737896,simMethod=cosine; clustMethod=hier; minClusterSize=2; excluded_as_singletons,0.13100923455948402
+Informative GO term dataset,enrichplot,layout=kk; nCluster=floor(sqrt(n))=17; min_edge=0.2; clusterFunction=kmeans,-0.0011906841826880515,layout=fr; nCluster=58; min_edge=0.1; clusterFunction=kmeans,0.11432371283480873

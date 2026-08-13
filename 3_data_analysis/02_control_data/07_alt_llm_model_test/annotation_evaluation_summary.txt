@@ -1,0 +1,7 @@
+Qwen LLM model: Qwen/Qwen3.6-35B-A3B
+Semantic embedding model: text-embedding-3-small
+Qwen versus GPT semantic cosine similarity: median 0.840 (IQR 0.806-0.874), n=16
+Qwen versus experts: median 0.753 (IQR 0.701-0.783), n=40; includes 'Not Available'
+Paired Qwen versus GPT expert-consistency Wilcoxon p-value: 0.0430819
+Qwen confidence (real): 0.958 +/- 0.018; random: 0.844 +/- 0.114
+Qwen real-random paired difference: 0.114; paired t p=0.022234; paired Wilcoxon p=0.0141474

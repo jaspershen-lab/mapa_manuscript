@@ -114,6 +114,8 @@ plot <- plot_similarity_network(
 )
 plot
 
+set.seed(6)
+
 plot <- plot_similarity_network(
   object = llm_interpreted_fm_res,
   level = "functional_module",
@@ -122,9 +124,22 @@ plot <- plot_similarity_network(
   llm_text = TRUE
 )
 
-plot
+plot + guides(fill = "none")
 
 library(Cairo)
-CairoPDF("02_proteomics_down_functional_module_network.pdf", width = 12, height = 8)
-plot
+CairoPDF("02_proteomics_down_functional_module_network.pdf", width = 8, height = 6)
+plot + guides(fill = "none")
+dev.off()
+
+p1 <-
+plot_module_info(
+  object = llm_interpreted_fm_res,
+  level = "functional_module",
+  database = c("go", "kegg"),
+  module_id = "Functional_module_1"
+)
+
+p <- p1 + ggplot2::geom_vline(xintercept = -log(0.05, 10), lwd = 0.5)
+CairoPDF("02_proteomics_down_functional_module_1_barplot.pdf", width = 6.5, height = 4.5)
+p
 dev.off()

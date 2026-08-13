@@ -1,0 +1,5 @@
+method,default_ari,default_n_clusters,default_native_n_clusters,default_n_unassigned,default_settings,optimized_ari,optimized_n_clusters,optimized_native_n_clusters,optimized_n_unassigned,optimized_settings,default_status
+MAPA,0.1719321135228537,42,42,0,"sim.cutoff=0.55, louvain",0.5656266979689193,77,77,0,"kmeans, centers=77 (existing result)",ok
+PAVER,0.15386220137684858,8,8,0,hclust_method=ward.D2; cutreeDynamic defaults; minClusterSize=20; unassigned_as_singletons,0.49463057180750786,77,77,0,hclust_method=complete; minClusterSize=2; maxCoreScatter=0.79; minGap=0.1575,ok
+aPEAR,0.017873145598737896,299,9,290,simMethod=jaccard; clustMethod=markov; minClusterSize=2; excluded_as_singletons,0.13100923455948402,175,98,77,simMethod=cosine; clustMethod=hier; minClusterSize=2; excluded_as_singletons,ok
+enrichplot,-0.0011906841826880515,17,17,0,layout=kk; nCluster=floor(sqrt(n))=17; min_edge=0.2; clusterFunction=kmeans,0.11432371283480873,58,58,0,layout=fr; nCluster=58; min_edge=0.1; clusterFunction=kmeans,ok

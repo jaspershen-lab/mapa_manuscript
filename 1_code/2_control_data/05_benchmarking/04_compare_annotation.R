@@ -245,6 +245,27 @@ setwd("3_data_analysis/02_control_data/05_benchmarking")
 load("feifan-combine_scores.Rdata")
 load("comparison_result/all_annotation_result.rda")
 
+expert_id_table <- readxl::read_excel(
+  file.path(
+    get_project_wd(), "2_data", "human_expert_functional_module_annotation",
+    "expert_name_id.xlsx"
+  )
+)
+
+expert_id_by_alias <- stats::setNames(
+  expert_id_table$expert_id,
+  expert_id_table$expert_name
+)
+expert_id_by_name <- expert_id_by_alias[expert_alias_by_name]
+
+is_human_expert <- combined_scores$expert_name != "LLM_Analysis"
+mapped_expert_ids <- unname(expert_id_by_name[combined_scores$expert_name])
+if (anyNA(mapped_expert_ids[is_human_expert])) {
+  stop("At least one human expert could not be mapped to expert_id.")
+}
+combined_scores$expert_name[is_human_expert] <-
+  mapped_expert_ids[is_human_expert]
+
 library(tidyr)
 
 long_data <- all_annotation_result %>%
@@ -303,7 +324,7 @@ cosine_similarity <- function(vec1, vec2) {
 human_data <- filtered_all_long_data %>%
   filter(method %in% human_expert) %>%
   select(cluster, method, name_emb) %>%
-  rename(expert_name = method, expert_embedding = name_emb, expert_cluster = cluster)
+  rename(expert_id = method, expert_embedding = name_emb, expert_cluster = cluster)
 
 tool_data <- filtered_all_long_data %>%
   filter(!method %in% human_expert) %>%
@@ -385,7 +406,7 @@ save(filtered_all_result_long_data, file = "comparison_result/filtered_all_resul
 human_data <- filtered_all_result_long_data %>%
   filter(method %in% human_expert) %>%
   select(cluster, method, combined_emb) %>%
-  rename(expert_name = method, expert_embedding = combined_emb, expert_cluster = cluster)
+  rename(expert_id = method, expert_embedding = combined_emb, expert_cluster = cluster)
 
 tool_data <- filtered_all_result_long_data %>%
   filter(!method %in% human_expert) %>%
@@ -415,11 +436,10 @@ annotation_result <-
 
 sim_hm_vs_tools <-
   combined_similarity_results |>
-  dplyr::select(tool_cluster, tool_name, expert_name, cosine_sim) |>
+  dplyr::select(tool_cluster, tool_name, expert_id, cosine_sim) |>
   dplyr::rename(functional_module = tool_cluster) |>
   dplyr::mutate(method = sub("_cluster_label", "", tool_name)) |>
-  dplyr::select(-tool_name) |>
-  left_join(hm_name_id, by = "expert_name")
+  dplyr::select(-tool_name)
 
 sim_hm_vs_tools <- sim_hm_vs_tools |> dplyr::select(functional_module, expert_id, method, cosine_sim)
 

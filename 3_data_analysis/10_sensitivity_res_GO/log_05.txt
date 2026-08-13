@@ -1,0 +1,178 @@
+r4projects 0.1.6 (2025-05-09 10:43:49.836725)
+The project name is:mapa_manuscript.Rproj
+Loading required package: massdataset
+massdataset 1.0.34 (2025-05-30 13:07:37.661287)
+
+Attaching package: ‘massdataset’
+
+The following object is masked from ‘package:stats’:
+
+    filter
+
+
+
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ lubridate 1.9.4     ✔ tibble    3.3.0
+✔ purrr     1.1.0     ✔ tidyr     1.3.1
+✔ readr     2.1.5     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ tidyr::extract()   masks magrittr::extract()
+✖ dplyr::filter()    masks massdataset::filter(), stats::filter()
+✖ dplyr::lag()       masks stats::lag()
+✖ purrr::set_names() masks magrittr::set_names()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+Attaching package: ‘data.table’
+
+The following objects are masked from ‘package:lubridate’:
+
+    hour, isoweek, mday, minute, month, quarter, second, wday, week,
+    yday, year
+
+The following object is masked from ‘package:purrr’:
+
+    transpose
+
+The following objects are masked from ‘package:dplyr’:
+
+    between, first, last
+
+Loading required package: BiocGenerics
+Loading required package: generics
+
+Attaching package: ‘generics’
+
+The following object is masked from ‘package:lubridate’:
+
+    as.difftime
+
+The following object is masked from ‘package:dplyr’:
+
+    explain
+
+The following object is masked from ‘package:massdataset’:
+
+    intersect
+
+The following objects are masked from ‘package:base’:
+
+    as.difftime, as.factor, as.ordered, intersect, is.element, setdiff,
+    setequal, union
+
+
+Attaching package: ‘BiocGenerics’
+
+The following object is masked from ‘package:dplyr’:
+
+    combine
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    anyDuplicated, aperm, append, as.data.frame, basename, cbind,
+    colnames, dirname, do.call, duplicated, eval, evalq, Filter, Find,
+    get, grep, grepl, is.unsorted, lapply, Map, mapply, match, mget,
+    order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+    rbind, Reduce, rownames, sapply, saveRDS, table, tapply, unique,
+    unsplit, which.max, which.min
+
+Loading required package: BiocFileCache
+Loading required package: dbplyr
+
+Attaching package: ‘dbplyr’
+
+The following objects are masked from ‘package:dplyr’:
+
+    ident, sql
+
+Warning messages:
+1: In fun(libname, pkgname) :
+  mzR has been built against a different Rcpp version (1.0.14)
+than is installed on your system (1.1.0). This might lead to errors
+when loading mzR. If you encounter such issues, please send a report,
+including the output of sessionInfo() to the Bioc support forum at 
+https://support.bioconductor.org/. For details see also
+https://github.com/sneumann/mzR/wiki/mzR-Rcpp-compiler-linker-issue.
+2: replacing previous import ‘dplyr::as_data_frame’ by ‘igraph::as_data_frame’ when loading ‘mapa’ 
+3: replacing previous import ‘dplyr::groups’ by ‘igraph::groups’ when loading ‘mapa’ 
+4: replacing previous import ‘dplyr::union’ by ‘igraph::union’ when loading ‘mapa’ 
+5: replacing previous import ‘Matrix::head’ by ‘utils::head’ when loading ‘mapa’ 
+6: replacing previous import ‘Matrix::tail’ by ‘utils::tail’ when loading ‘mapa’ 
+7: package ‘AnnotationHub’ was built under R version 4.5.1 
+Loading required package: grid
+========================================
+ComplexHeatmap version 2.24.1
+Bioconductor page: http://bioconductor.org/packages/ComplexHeatmap/
+Github page: https://github.com/jokergoo/ComplexHeatmap
+Documentation: http://jokergoo.github.io/ComplexHeatmap-reference
+
+If you use it in published research, please cite either one:
+- Gu, Z. Complex Heatmap Visualization. iMeta 2022.
+- Gu, Z. Complex heatmaps reveal patterns and correlations in multidimensional 
+    genomic data. Bioinformatics 2016.
+
+
+The new InteractiveComplexHeatmap package can directly export static 
+complex heatmaps into an interactive Shiny app with zero effort. Have a try!
+
+This message can be suppressed by:
+  suppressPackageStartupMessages(library(ComplexHeatmap))
+========================================
+! pheatmap() has been masked by ComplexHeatmap::pheatmap(). Most of the arguments
+   in the original pheatmap() are identically supported in the new function. You 
+   can still use the original function by explicitly calling pheatmap::pheatmap().
+
+
+Attaching package: ‘ComplexHeatmap’
+
+The following object is masked from ‘package:pheatmap’:
+
+    pheatmap
+
+Warning message:
+package ‘ComplexHeatmap’ was built under R version 4.5.1 
+pdf 
+  2 
+
+	Kruskal-Wallis rank sum test
+
+data:  ari_score by Algorithm
+Kruskal-Wallis chi-squared = 1341.1, df = 20, p-value < 2.2e-16
+
+## FSA v0.10.0. See citation('FSA') if used in publication.
+## Run fishR() for related website and fishR('IFAR') for related book.
+Warning message:
+Algorithm was coerced to a factor. 
+
+Attaching package: ‘rcompanion’
+
+The following object is masked from ‘package:generics’:
+
+    accuracy
+
+                   Group Letter MonoLetter
+1   Affinity_propagation    abc   abc     
+2             Binary_cut adefgh   a  defgh
+3       edge_betweenness    deg      de g 
+4            fast_greedy    dfg      d fg 
+5                    GMM      b    b      
+6                HDBSCAN adefgh   a  defgh
+7   hierarchical_average    deg      de g 
+8  hierarchical_centroid      h          h
+9  hierarchical_complete     ae   a   e   
+10 hierarchical_mcquitty     de      de   
+11   hierarchical_median     fh        f h
+12   hierarchical_single     fh        f h
+13   hierarchical_ward.D      b    b      
+14  hierarchical_ward.D2     bc    bc     
+15               infomap    deg      de g 
+16                kmeans      b    b      
+17            label_prop    fgh        fgh
+18         leading_eigen     dg      d  g 
+19               louvain    deg      de g 
+20            Mean_shift  acdeg   a cde g 
+21              walktrap     dg      d  g 

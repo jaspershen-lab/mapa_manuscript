@@ -230,7 +230,12 @@ save(llm_interpreted_object, file = "taxid_9606/stomach/up/llm_interpreted_objec
 load("taxid_9606/stomach/down/multi_omics_fm.rda")
 
 multi_omics_fm$functional_module_result <- multi_omics_fm$functional_module_result |>
-  dplyr::filter(multi_omics_num == 3)
+  dplyr::filter(
+    module == "Functional_module_6",
+    module_content_number >= 3,
+    true_omics_num == 3,
+    include_metabolites
+  )
 
 llm_interpreted_object <- llm_interpret_module(object = multi_omics_fm,
                                                module_content_number_cutoff = 3,
@@ -250,7 +255,7 @@ llm_interpreted_object <- llm_interpret_module(object = multi_omics_fm,
                                                api_provider = "openai")
 
 plot_module_info(llm_interpreted_object,
-                 module_id = "Functional_module_1",
+                 module_id = "Functional_module_6",
                  llm_text = TRUE)
 
 save(llm_interpreted_object, file = "taxid_9606/stomach/down/llm_interpreted_object.rda")
@@ -406,10 +411,15 @@ save(llm_interpreted_object, file = "taxid_9606/thyroid/up/llm_interpreted_objec
 load("taxid_9606/thyroid/down/multi_omics_fm.rda")
 
 multi_omics_fm$functional_module_result <- multi_omics_fm$functional_module_result |>
-  dplyr::filter(multi_omics_num == 3)
+  dplyr::filter(
+    module == "Functional_module_18",
+    module_content_number >= 3,
+    true_omics_num == 3,
+    include_metabolites
+  )
 
 llm_interpreted_object <- llm_interpret_module(object = multi_omics_fm,
-                                               module_content_number_cutoff = 3,
+                                               module_content_number_cutoff = 2,
                                                llm_model = "gpt-4o-mini-2024-07-18",
                                                embedding_model = "text-embedding-3-small",
                                                api_key = api_key,
@@ -426,7 +436,7 @@ llm_interpreted_object <- llm_interpret_module(object = multi_omics_fm,
                                                api_provider = "openai")
 
 plot_module_info(llm_interpreted_object,
-                 module_id = "Functional_module_1",
+                 module_id = "Functional_module_18",
                  llm_text = TRUE)
 
 save(llm_interpreted_object, file = "taxid_9606/thyroid/down/llm_interpreted_object.rda")

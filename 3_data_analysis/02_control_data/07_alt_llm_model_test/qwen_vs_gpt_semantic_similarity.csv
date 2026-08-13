@@ -1,0 +1,17 @@
+"module","matched_module","group","qwen_module_name","gpt_module_name","cosine_similarity"
+"Functional_module_10","Functional_module_10","Real","Apoptosis and MAPK Signaling in Cellular Stress and Cancer","Apoptosis and MAPK Signaling in Cancer and Cellular Stress",0.952609344323867
+"Functional_module_11","Functional_module_11","Real","Regulation of Striated Muscle Cell Differentiation and Satellite Cell Fate","Regulation of Muscle Cell Differentiation",0.874372674844947
+"Functional_module_12","Functional_module_12","Real","Ubiquitin-Proteasome System and Proteasomal Degradation in Disease","Ubiquitin-Proteasome Pathway in Cellular Regulation and Disease",0.905581237261996
+"Functional_module_4","Functional_module_4","Real","Glutamatergic Synaptic Transmission and Plasticity in Neurodevelopmental Disorders","Glutamatergic Synapse Dynamics in Neurodevelopmental Disorders",0.878333755525091
+"Functional_module_5","Functional_module_5","Real","Eukaryotic DNA Replication Licensing, Fork Progression, and Genomic Stability","Regulation of DNA Replication and Genomic Stability",0.860814630211908
+"Functional_module_7","Functional_module_7","Real","Mitochondrial Oxidative Phosphorylation and Electron Transport Chain Dynamics","Mitochondrial Dysfunction in Oxidative Phosphorylation and Neurodegeneration",0.840754977698931
+"Functional_module_8","Functional_module_8","Real","Adaptive Immune Receptor Signaling and Lymphocyte Activation","Adaptive Immune Response in Inflammation and Autoimmunity",0.838959258728789
+"Functional_module_9","Functional_module_9","Real","De Novo Lipogenesis and TCA Cycle Integration in Metabolic Dysregulation","Fatty Acid Metabolism and Biosynthesis Regulation",0.860668557027084
+"Random Functional_module_10","Functional_module_10","Random","Ubiquitin-Regulated MAPK Signaling in Cancer and Inflammation","MAPK Signaling Pathways in Cancer and Inflammation",0.82853061015603
+"Random Functional_module_11","Functional_module_11","Random","DNA Replication and Cell Cycle Progression Regulated by BCR/MAPK Signaling","MAPK Signaling and DNA Replication Regulation",0.814141170116028
+"Random Functional_module_12","Functional_module_12","Random","Mitochondrial Oxidative Phosphorylation and Metabolic-Signaling Integration in Disease","T Cell Activation and Mitochondrial Bioenergetics in Cancer",0.781736072608202
+"Random Functional_module_4","Functional_module_4","Random","Replicative DNA Polymerase and Primosome Complex in Cell Proliferation and Metabolic Regulation","DNA Replication and Short-Chain Fatty Acid Metabolism in Muscle Differentiation",0.684557537855008
+"Random Functional_module_5","Functional_module_5","Random","Immune Cell Activation, Antigen Presentation, and Inflammatory Signaling","Immune Modulation and Muscle Differentiation in Metabolic Dysfunction",0.668432999700896
+"Random Functional_module_7","Functional_module_7","Random","Ubiquitin-Dependent Coordination of DNA Replication and Lipid Metabolism","DNA Replication and Ubiquitin-Mediated Lipid Metabolism Regulation",0.87404420512599
+"Random Functional_module_8","Functional_module_8","Random","Adaptive Immune Activation and Lymphocyte Receptor Signaling","Glutamatergic and Immune Signaling in B Cell Activation",0.7790009743103
+"Random Functional_module_9","Functional_module_9","Random","Ubiquitin-Proteasome-Mediated Apoptosis and Immune Inflammatory Signaling","Apoptosis Regulation in Cancer and Immune Responses",0.830924429928174

@@ -5,58 +5,71 @@ source("1_code/100_tools.R")
 
 setwd("2_data/case_study/02_monkey_multi_omics/")
 
-tissues <- c("aortic_arch", "thymus", "spleen", "thyroid")
+tissues <- c("aortic_arch", "kidney", "ovary", "spleen",
+             "stomach", "thymus", "thyroid")
 directions <- c("up", "down")
 
-# Collect feature counts for modules with multi_omics_num == 3 ----
+split_module_ids <- function(x) {
+  if (length(x) == 0 || is.na(x) || !nzchar(trimws(x))) {
+    return(character())
+  }
+
+  ids <- trimws(strsplit(as.character(x), "/", fixed = TRUE)[[1]])
+  unique(ids[nzchar(ids)])
+}
+
+load_input_gene_symbols <- function(rda_path) {
+  object_env <- new.env(parent = emptyenv())
+  object_names <- load(rda_path, envir = object_env)
+  if (length(object_names) != 1) {
+    stop("Expected one object in ", rda_path)
+  }
+
+  variable_info <- methods::slot(object_env[[object_names[[1]]]], "variable_info")
+  symbols <- trimws(as.character(variable_info$symbol))
+  unique(symbols[!is.na(symbols) & nzchar(symbols)])
+}
+
+# Collect feature counts for metabolite-containing modules with
+# module_content_number >= 3 and true_omics_num == 3 ----
 all_data <- lapply(tissues, function(tissue) {
   lapply(directions, function(dir) {
-    rda_path <- file.path("taxid_9606", tissue, dir, "multi_omics_fm.rda")
-    if (!file.exists(rda_path)) return(NULL)
+    result_dir <- file.path("taxid_9606", tissue, dir)
+    rda_path <- file.path(result_dir, "multi_omics_fm.rda")
+    rna_path <- file.path(result_dir, paste0(dir, "_rna_enriched_pathways.rda"))
+    prot_path <- file.path(result_dir, paste0(dir, "_prot_enriched_pathways.rda"))
+    if (!all(file.exists(c(rda_path, rna_path, prot_path)))) return(NULL)
 
-    load(rda_path)
+    result_env <- new.env(parent = emptyenv())
+    load(rda_path, envir = result_env)
+    fm_result <- result_env$multi_omics_fm$functional_module_result
 
-    fm_result <- multi_omics_fm$functional_module_result
-    result_node <- multi_omics_fm$result_with_module
+    rna_symbols <- load_input_gene_symbols(rna_path)
+    prot_symbols <- load_input_gene_symbols(prot_path)
 
-    m3_modules <- fm_result$module[fm_result$multi_omics_num == 3]
-    if (length(m3_modules) == 0) return(NULL)
+    target_module_info <- fm_result |>
+      dplyr::filter(
+        module_content_number >= 3,
+        true_omics_num == 3,
+        include_metabolites
+      ) |>
+      dplyr::select(module, module_content_number, genes, metabolites)
+    if (nrow(target_module_info) == 0) return(NULL)
 
-    # For each node in m3 modules, extract omic source:
-    #   - gene with dt_src containing "T" -> Transcriptome
-    #   - gene with dt_src containing "P" -> Proteome
-    #   - metabolite                       -> Metabolome
-    #   - pathway nodes are excluded (no single omic source)
-    m3_nodes <- result_node %>% filter(module %in% m3_modules)
+    purrr::map_dfr(seq_len(nrow(target_module_info)), function(i) {
+      genes <- split_module_ids(target_module_info$genes[[i]])
+      metabolites <- split_module_ids(target_module_info$metabolites[[i]])
 
-    omic_rows <- lapply(seq_len(nrow(m3_nodes)), function(i) {
-      row       <- m3_nodes[i, ]
-      node_info <- row$node_info[[1]]
-
-      if (row$node_type == "metabolite") {
-        return(data.frame(module = row$module, omic = "Metabolome",
-                          stringsAsFactors = FALSE))
-      }
-      if (row$node_type == "gene" && is.list(node_info) && !is.null(node_info$dt_src)) {
-        src <- node_info$dt_src
-        out <- data.frame(module = character(), omic = character(),
-                          stringsAsFactors = FALSE)
-        if (grepl("T", src))
-          out <- rbind(out, data.frame(module = row$module, omic = "Transcriptome",
-                                       stringsAsFactors = FALSE))
-        if (grepl("P", src))
-          out <- rbind(out, data.frame(module = row$module, omic = "Proteome",
-                                       stringsAsFactors = FALSE))
-        return(out)
-      }
-      NULL  # pathway nodes excluded
+      tibble::tibble(
+        module = target_module_info$module[[i]],
+        module_content_number = target_module_info$module_content_number[[i]],
+        tissue = tissue,
+        direction = dir,
+        Metabolome = length(metabolites),
+        Proteome = sum(genes %in% prot_symbols),
+        Transcriptome = sum(genes %in% rna_symbols)
+      )
     })
-
-    counts <- bind_rows(omic_rows) %>%
-      group_by(module, omic) %>%
-      summarise(count = n(), .groups = "drop") %>%
-      mutate(tissue = tissue, direction = dir)
-    counts
   })
 })
 
@@ -66,9 +79,9 @@ conf_data <- lapply(tissues, function(tissue) {
     llm_path <- file.path("taxid_9606", tissue, dir, "llm_interpreted_object.rda")
     if (!file.exists(llm_path)) return(NULL)
 
-    load(llm_path)  # loads llm_interpreted_object
-
-    interp <- llm_interpreted_object$llm_module_interpretation
+    llm_env <- new.env(parent = emptyenv())
+    load(llm_path, envir = llm_env)
+    interp <- llm_env$llm_interpreted_object$llm_module_interpretation
     if (is.null(interp) || length(interp) == 0) return(NULL)
 
     scores <- lapply(names(interp), function(mod_id) {
@@ -85,28 +98,53 @@ conf_data <- lapply(tissues, function(tissue) {
 
 conf_df <- bind_rows(Filter(Negate(is.null), unlist(conf_data, recursive = FALSE)))
 
-plot_data <- bind_rows(Filter(Negate(is.null), unlist(all_data, recursive = FALSE)))
-
-# Build a y-axis label: "tissue (direction) | module_id"
-plot_data <- plot_data %>%
+module_summary <- bind_rows(Filter(Negate(is.null), unlist(all_data, recursive = FALSE))) |>
   mutate(
-    y_label = paste0(gsub("_", " ", tissue), " (", direction, ") | ", module),
+    total_count = Metabolome + Proteome + Transcriptome,
+    y_label = paste0(gsub("_", " ", tissue), " (", direction, ") | ", module)
+  ) |>
+  left_join(conf_df, by = c("module", "tissue", "direction")) |>
+  arrange(factor(tissue, levels = tissues),
+          desc(module_content_number), direction, module)
+
+if (nrow(module_summary) != 21) {
+  stop("Expected 21 target modules, found ", nrow(module_summary))
+}
+
+table_data <- module_summary |>
+  transmute(
+    y_label,
+    module,
+    tissue,
+    regulation_direction = direction,
+    total_count,
+    Metabolome,
+    Proteome,
+    Transcriptome,
+    confidence_score
+  )
+
+write.csv(
+  table_data,
+  file = "taxid_9606/Supplementary_Data_2_Table_S4_multi_omics_modules.csv",
+  row.names = FALSE,
+  na = ""
+)
+
+plot_data <- module_summary |>
+  tidyr::pivot_longer(
+    cols = c(Metabolome, Proteome, Transcriptome),
+    names_to = "omic",
+    values_to = "count"
+  ) |>
+  mutate(
     omic    = factor(omic,
                      levels = c("Transcriptome", "Proteome", "Metabolome"))
   )
 
-# Order y-axis: tissue order as defined in `tissues`, then within each tissue
-# sort by total feature count descending (largest at top, smallest at bottom)
-total_counts <- plot_data %>%
-  group_by(y_label) %>%
-  summarise(total_count = sum(count), .groups = "drop")
-
-plot_data <- plot_data %>%
-  mutate(tissue_f = factor(tissue, levels = tissues)) %>%
-  left_join(total_counts, by = "y_label") %>%
-  arrange(tissue_f, desc(total_count))
-
-y_order <- unique(plot_data$y_label)
+# Order y-axis: tissues alphabetically, then within each tissue sort by
+# module_content_number descending (largest at top, smallest at bottom)
+y_order <- module_summary$y_label
 plot_data$y_label <- factor(plot_data$y_label, levels = rev(y_order))
 
 # Colors for omic types
@@ -116,15 +154,7 @@ omic_colors <- c(
   "Metabolome"    = "#71b7ed"
 )
 
-multi_omics_fm_id <- plot_data |>
-  group_by(y_label) |>
-  summarise(freq = n()) |>
-  ungroup() |>
-  filter(freq > 1) |>
-  pull(y_label) |>
-  unique()
-
-plot_data_filtered <- plot_data |> filter(y_label %in% multi_omics_fm_id)
+plot_data_filtered <- plot_data
 
 # Per-module total bar length and confidence score for point layer ----
 point_data <- plot_data_filtered |>
@@ -170,16 +200,13 @@ p <- ggplot(plot_data_filtered,
 p
 
 ggsave(
-  filename = file.path("taxid_9606/multi_omics_tissue_feature_count.pdf"),
+  filename = file.path("taxid_9606/multi_omics_tissue_feature_count_updated.pdf"),
   plot     = p,
   width    = 5,
-  height   = 7.2
+  height   = 6.8
 )
 
-
-
 plot_data_filtered |>
-  dplyr::distinct(module, tissue) |>
-  dplyr::group_by(tissue) |>
-  summarise(freq = n()) |>
-  ungroup()
+  dplyr::distinct(y_label, module, tissue, direction, module_content_number) |>
+  dplyr::arrange(factor(tissue, levels = tissues),
+                 dplyr::desc(module_content_number), direction, module)

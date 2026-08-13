@@ -1,0 +1,25 @@
+simMethod,clustMethod,minClusterSize,ARI,n_clusters,native_n_clusters,native_n_assigned,n_unassigned,status
+jaccard,markov,2,0.017873145598737896,299,9,23,290,ok
+cosine,markov,2,0.10286858667419348,258,28,83,230,ok
+cor,markov,2,0.09051359713099143,264,28,77,236,ok
+jaccard,hier,2,0.1061737626555712,239,58,132,181,ok
+cosine,hier,2,0.13100923455948402,175,98,236,77,ok
+cor,hier,2,0.12910848822879212,179,99,233,80,ok
+jaccard,markov,3,0.0064366140544887904,305,3,11,302,ok
+cosine,markov,3,0.08590715896786623,274,12,51,262,ok
+cor,markov,3,0.07059936498175948,281,11,43,270,ok
+jaccard,hier,3,0.05703409647071619,288,9,34,279,ok
+cosine,hier,3,0.10062704483303421,244,29,98,215,ok
+cor,hier,3,0.09432623145481595,251,27,89,224,ok
+jaccard,markov,5,0.0067238757057285796,309,1,5,308,ok
+cosine,markov,5,0.05858928471037985,291,4,26,287,ok
+cor,markov,5,0.04428940600047652,299,3,17,296,ok
+jaccard,hier,5,0.03365666491023653,301,3,15,298,ok
+cosine,hier,5,0.03978334687007662,297,4,20,293,ok
+cor,hier,5,0.03365666491023653,301,3,15,298,ok
+jaccard,markov,10,NA,NA,NA,NA,NA,No clusters found.
+cosine,markov,10,0.048507231197608934,304,1,10,303,ok
+cor,markov,10,NA,NA,NA,NA,NA,No clusters found.
+jaccard,hier,10,NA,NA,NA,NA,NA,No clusters found.
+cosine,hier,10,NA,NA,NA,NA,NA,No clusters found.
+cor,hier,10,NA,NA,NA,NA,NA,No clusters found.

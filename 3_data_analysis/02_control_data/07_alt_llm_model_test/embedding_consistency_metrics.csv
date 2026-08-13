@@ -1,0 +1,10 @@
+"metric","value"
+"Qwen ARI vs ground truth",0.811017330070419
+"Original ARI vs ground truth",0.94989406779661
+"Qwen vs original clustering ARI",0.852716799003581
+"Pairwise similarity Pearson r",0.821326592836567
+"Pairwise similarity Spearman rho",0.603267098996575
+"Qwen number of clusters",12
+"Original number of clusters",14
+"Qwen edges at cutoff",66
+"Original edges at cutoff",57

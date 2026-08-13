@@ -1,0 +1,2 @@
+"n_pairs","median","q1","q3","excluded_pairs","report"
+76,0.817125374818856,0.784137799895113,0.84672257406675,4,"a median pairwise cosine similarity of 0.817 (IQR: 0.784–0.847)"
